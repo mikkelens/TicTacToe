@@ -328,6 +328,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b0165cf13ea9ef4385ba61cf9c0234e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blueColor: {r: 0, g: 0.3771906, b: 1, a: 1}
+  redColor: {r: 1, g: 0, b: 0, a: 1}
+  currentBoard: {fileID: 0}
 --- !u!4 &1393771847
 Transform:
   m_ObjectHideFlags: 0
