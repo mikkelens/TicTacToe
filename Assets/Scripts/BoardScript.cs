@@ -18,42 +18,43 @@ public class BoardScript : MonoBehaviour
     
     private Manager _manager;
     
-    private SpaceScript[,] _cubes = new SpaceScript[3, 3];
-    private PlayerColors[,] _board = new PlayerColors[3, 3];
+    private Transform[,] _pieces = new Transform[3, 3];
+    private PlayerColors[,] _boardColors = new PlayerColors[3, 3];
+    public PlayerColors[,] BoardColors => _boardColors;
     private Vector2Int _lastBlueCoords;
     public Vector2Int LastBlueCoords => _lastBlueCoords;
     private Vector2Int _lastRedCoords;
     public Vector2Int LastRedCoords => _lastRedCoords;
 
-    private int _turns;
-    public PlayerColors PlayerTurn => _turns % 2 == 0 ? PlayerColors.Blue : PlayerColors.Red;
-
-    public void OnSpawn(PlayerColors[,] permanents) // called with 
+    private int _roundTurns;
+    public PlayerColors PlayerTurn => _roundTurns % 2 == 0 ? PlayerColors.Blue : PlayerColors.Red;
+    public PlayerColors LastPlayerTurn => _roundTurns % 2 == 1 ? PlayerColors.Blue : PlayerColors.Red;
+    
+    public void StartNewRound()
     {
         _manager = Manager.Main;
-        _turns = 0;
-
-        // show permanent
-        _board = permanents;
-        AddCubeColors(permanents);
-
-        // start
-        // GameStart();
+        CleanBoard();
+        _roundTurns = 0;
+        _boardColors = (PlayerColors[,])_manager.PermanentColors.Clone();
     }
-    
-    private void AddCubeColors(PlayerColors[,] addedColors)
-    {
-        for (int x = 0; x < addedColors.Length; x++)
-        {
-            for (int y = 0; y < addedColors.Length; y++) // assumed square dimensions
-            {
-                PlayerColors playerColor = addedColors[x, y];
-                if (playerColor == PlayerColors.None) return;
-                
-                Material material = _cubes[x, y].GetComponent<MeshRenderer>().sharedMaterial;
 
-                Color color = playerColor == PlayerColors.Blue ? blueColor : redColor;
-                material.color = color;
+    private void CleanBoard()
+    {
+        for (int x = 0; x < _boardColors.GetLength(0); x++)
+        {
+            for (int y = 0; y < _boardColors.GetLength(1); y++)
+            {
+                // Debug.Log($"X: {x}, Y: {y}, LENGTH 0: {_boardColors.GetLength(0)}, LENGTH 1: {_boardColors.GetLength(1)}");
+                _boardColors[x, y] = PlayerColors.None;
+                Transform piece = _pieces[x, y];
+                
+                if (piece != null)
+                {
+                    if (_manager.PermanentColors[x, y] == PlayerColors.None) // a piece and not permanent
+                    {
+                        Destroy(piece.gameObject);
+                    }
+                }
             }
         }
     }
@@ -66,30 +67,37 @@ public class BoardScript : MonoBehaviour
     /// Called by a space that got pressed. Calling this switches turn.
     /// </summary>
     /// <param name="space"></param>
-    public void PlacedShapeOnSpace(SpaceScript space)
+    public void PlacedShape(SpaceScript space)
     {
         // spawn prefab
         if (PlayerTurn == PlayerColors.Blue)
         {
-            SpawnShapePrefab(bluePrefab, space.transform.position);
+            SpawnShapeOnSpace(bluePrefab, space);
             _lastBlueCoords = space.Coords;
         }
         else
         {
-            SpawnShapePrefab(redPrefab, space.transform.position);
+            SpawnShapeOnSpace(redPrefab, space);
             _lastRedCoords = space.Coords;
         }
 
         // turn ends
-        _turns++;
+        _boardColors[space.Coords.x, space.Coords.y] = PlayerTurn;
+        _roundTurns++;
     }
 
-    public void SpawnShapePrefab(GameObject prefab, Vector3 pos)
+    private void SpawnShapeOnSpace(GameObject prefab, SpaceScript space)
     {
         Vector3 verticalOffset = Vector3.up * verticalSpawnDistance;
         
         Transform shapeTransform = Instantiate(prefab).transform; // spawn, get transform
-        shapeTransform.position = pos + verticalOffset; // set up in the air
+        shapeTransform.position = space.transform.position + verticalOffset; // set up in the air
         shapeTransform.parent = _manager.PiecesParent; // set in a parent (for editor convenience)
+        
+        Vector2Int coords = space.Coords;
+        _pieces[coords.x, coords.y] = shapeTransform;
+        
+        Material material = shapeTransform.GetComponent<MeshRenderer>().material;
+        material.color = PlayerTurn == PlayerColors.Blue ? blueColor : redColor;
     }
 }

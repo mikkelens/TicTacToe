@@ -9,11 +9,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3769781962866185633, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
       propertyPath: m_Name
-      value: Shape
+      value: O (shape)
       objectReference: {fileID: 0}
     - target: {fileID: 3769781962866185636, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769781962866185636, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3769781962866185636, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3769781962866185636, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -29,11 +37,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3769781962866185636, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 3769781962866185636, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 3769781962866185636, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
       propertyPath: m_LocalRotation.y
@@ -45,7 +53,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3769781962866185636, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: 3769781962866185636, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -55,5 +63,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3769781962866185637, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: -8803937527578110353, guid: e21622ce6be7dfa4aa4baf372fceab9a, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9f705ced42d34db428e18a2fb48a522d, type: 3}
