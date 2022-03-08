@@ -34,7 +34,7 @@ public class BoardScript : MonoBehaviour
     {
         _manager = Manager.Main;
         CleanBoard();
-        _roundTurns = 0;
+        _roundTurns++;
         _boardColors = (PlayerColors[,])_manager.PermanentColors.Clone();
     }
 
