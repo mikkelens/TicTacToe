@@ -11,40 +11,36 @@ public class BoardScript : MonoBehaviour
     // [SerializeField] private float horizontalSpawnDistance = 4f;
     [SerializeField] private float verticalSpawnDistance = 6f;
     [SerializeField] private GameObject bluePrefab;
-    [SerializeField] private Color blueColor = Color.blue;
     [SerializeField] private GameObject redPrefab;
+    [SerializeField] private Color blueColor = Color.blue;
     [SerializeField] private Color redColor = Color.red;
+    [SerializeField] private Material permanentMaterial;
 
     [SerializeField] private float waitAfterWin = 3f;
 
     [SerializeField] private Image shapeIcon;
     [SerializeField] private Sprite blueIcon;
     [SerializeField] private Sprite redIcon;
-
-    public Material PermanentMaterial => permanentMaterial;
-    [SerializeField] private Material permanentMaterial;
     // public float Whiteness = 0.1f;
     
     private readonly bool[,] _higlights = new bool[3, 3];
     private readonly PlayerColors[,] _permanentColors = new PlayerColors[3, 3];
     
-    public Transform[,] Pieces => _pieces;
     private readonly Transform[,] _pieces = new Transform[3, 3];
     private PlayerColors[,] _boardColors = new PlayerColors[3, 3];
     public PlayerColors[,] BoardColors => _boardColors;
-    
-    public Vector2Int LastBlueCoords => _lastBlueCoords;
-    private Vector2Int _lastBlueCoords;
-    public Vector2Int LastRedCoords => _lastRedCoords;
-    private Vector2Int _lastRedCoords;
 
-    public bool Ending => _ending;
-    private bool _ending;
+    private Vector2Int LastBlueCoords => _lastBlueCoords;
+    private Vector2Int _lastBlueCoords;
+    private Vector2Int LastRedCoords => _lastRedCoords;
+    private Vector2Int _lastRedCoords;
     
+    private bool _ending;
     private int _roundTurns;
-    public PlayerColors PlayerTurn => _roundTurns % 2 == 1 ? PlayerColors.Blue : PlayerColors.Red;
 
     private Manager _manager;
+    
+    private PlayerColors PlayerTurn => _roundTurns % 2 == 1 ? PlayerColors.Blue : PlayerColors.Red;
 
     private void Awake()
     {
@@ -67,25 +63,20 @@ public class BoardScript : MonoBehaviour
         {
             for (int y = 0; y < _boardColors.GetLength(1); y++)
             {
-                // Debug.Log($"X: {x}, Y: {y}, LENGTH 0: {_boardColors.GetLength(0)}, LENGTH 1: {_boardColors.GetLength(1)}");
                 _boardColors[x, y] = PlayerColors.None;
                 Transform piece = _pieces[x, y];
                 
                 if (piece != null)
                 {
-                    if (_permanentColors[x, y] == PlayerColors.None) // a piece and not permanent
-                    {
-                        Destroy(piece.gameObject);
-                    }
+                    if (_permanentColors[x, y] != PlayerColors.None) continue;
+                    
+                    _pieces[x, y] = null;
+                    Destroy(piece.gameObject);
                 }
             }
         }
     }
-
-    // "Game" is defined as a tic tac toe game within the metagame (multiple "games"),
-    // Games are run by player interaction directly (each turn).
-    // "Turn" is a player turn
-
+    
     /// <summary>
     /// Called by a space that got pressed. Calling this switches turn.
     /// </summary>
@@ -113,7 +104,6 @@ public class BoardScript : MonoBehaviour
         if (CheckForWin())
         {
             _ending = true;
-            Debug.Log("A player has won this round.");
             StartCoroutine(WinState());
         }
     }
@@ -137,20 +127,23 @@ public class BoardScript : MonoBehaviour
     {
         yield return new WaitForSeconds(waitAfterWin);
         _ending = false;
-        _manager.EndRound();
+        EndRound();
     }
 
     #region win check
     private bool CheckForWin()
     {
+        int filled = 0;
         // Debug.Log("! STARTED WIN CHECK");
         // algorithm checks for every space, then for every space around it. if space is filled, then check opposite.
         for (int x = 0; x < _boardColors.GetLength(0); x++)
         {
             for (int y = 0; y < _boardColors.GetLength(1); y++)
             {
+                
                 PlayerColors spaceColor = _boardColors[x, y];
                 if (spaceColor == PlayerColors.None) continue;
+                filled++;
                 
                 if (CheckDirectionsFromSpace(new Vector2Int(x, y), spaceColor))
                     return true;
@@ -160,7 +153,6 @@ public class BoardScript : MonoBehaviour
     }
     private bool CheckDirectionsFromSpace(Vector2Int originCoords, PlayerColors color)
     {
-        // Debug.Log($"Started check on space: {originCoords}");
         // check 3x3 grid centered on space coords as a "direction"
         for (int x = -1; x <= 1; x++)
         {
@@ -207,8 +199,21 @@ public class BoardScript : MonoBehaviour
         _roundTurns++;
         shapeIcon.sprite = PlayerTurn == PlayerColors.Blue ? blueIcon : redIcon;
     }
+    
+    /// <summary>
+    /// Called by pressing "end round" button
+    /// </summary>
+    private void EndRound()
+    {
+        if (_ending) return;
 
-    public void AddNewPermanent(PlayerColors color, Vector2Int permPos)
+        PlayerColors color = PlayerTurn; // not last player turn because game is jank and "ahead"
+        Vector2Int newPermPos = color == PlayerColors.Blue ? LastBlueCoords : LastRedCoords;
+        AddNewPermanent(color, newPermPos);
+        StartNewRound();
+    }
+
+    private void AddNewPermanent(PlayerColors color, Vector2Int permPos)
     {
         _permanentColors[permPos.x, permPos.y] = color;
 

@@ -1353,8 +1353,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1903277951}
-        m_TargetAssemblyTypeName: Manager, Assembly-CSharp
+      - m_Target: {fileID: 2086258795}
+        m_TargetAssemblyTypeName: BoardScript, Assembly-CSharp
         m_MethodName: EndRound
         m_Mode: 1
         m_Arguments:

@@ -61,20 +61,4 @@ public class Manager : MonoBehaviour
             }
         }
     }
-    
-    /// <summary>
-    /// Called by pressing "end round" button
-    /// </summary>
-    public void EndRound()
-    {
-        if (board.Ending) return;
-
-        Debug.Log("Ended a round");
-            
-        PlayerColors color = board.PlayerTurn; // not last player turn because game is jank and "ahead"
-        Vector2Int newPermPos = color == PlayerColors.Blue ? board.LastBlueCoords : board.LastRedCoords;
-        board.AddNewPermanent(color, newPermPos);
-            
-        board.StartNewRound();
-    }
 }
