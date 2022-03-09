@@ -19,12 +19,6 @@ public class Manager : MonoBehaviour
     // assigned in script just shown for convenience
     private Camera _cam;
 
-    // readonly is assuming only one metagame will be played
-    // (metagames are the full funny thing, games are just normal tic tac toe type events)
-    private readonly PlayerColors[,] _permanentColors = new PlayerColors[3, 3];
-    private readonly bool[,] _higlights = new bool[3, 3];
-    public PlayerColors[,] PermanentColors => _permanentColors;
-
     private Manager() { }
 
     private void Awake()
@@ -50,11 +44,11 @@ public class Manager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastForSpace();
+            RaycastForSpaceOnMouse();
         }
     }
 
-    private void RaycastForSpace()
+    private void RaycastForSpaceOnMouse()
     {
         // raycast on space, call spacescript.pressspace with board
         int mask = LayerMask.GetMask("Space");
@@ -79,18 +73,8 @@ public class Manager : MonoBehaviour
             
         PlayerColors color = board.PlayerTurn; // not last player turn because game is jank and "ahead"
         Vector2Int newPermPos = color == PlayerColors.Blue ? board.LastBlueCoords : board.LastRedCoords;
-        AddNewPermanent(color, newPermPos);
+        board.AddNewPermanent(color, newPermPos);
             
         board.StartNewRound();
-    }
-
-    private void AddNewPermanent(PlayerColors color, Vector2Int permPos)
-    {
-        _permanentColors[permPos.x, permPos.y] = color;
-
-        _higlights[permPos.x, permPos.y] = true;
-        Material material = board.Pieces[permPos.x, permPos.y].GetComponent<MeshRenderer>().material;
-        material.SetColor("_EmissionColor", Color.white * board.Whiteness);
-        Debug.Log($"New permanent: {permPos - Vector2Int.one}");
     }
 }

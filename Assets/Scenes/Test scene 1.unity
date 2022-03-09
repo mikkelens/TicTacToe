@@ -1520,6 +1520,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: permanentMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 2adee37f4009aee48bcc51f2ff66643d, type: 2}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: nextPlayer.Array.size
       value: 2
       objectReference: {fileID: 0}

@@ -21,7 +21,12 @@ public class BoardScript : MonoBehaviour
     [SerializeField] private Sprite blueIcon;
     [SerializeField] private Sprite redIcon;
 
-    public float Whiteness = 0.1f;
+    public Material PermanentMaterial => permanentMaterial;
+    [SerializeField] private Material permanentMaterial;
+    // public float Whiteness = 0.1f;
+    
+    private readonly bool[,] _higlights = new bool[3, 3];
+    private readonly PlayerColors[,] _permanentColors = new PlayerColors[3, 3];
     
     public Transform[,] Pieces => _pieces;
     private readonly Transform[,] _pieces = new Transform[3, 3];
@@ -53,7 +58,7 @@ public class BoardScript : MonoBehaviour
         
         IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
         CleanBoard();
-        _boardColors = (PlayerColors[,])_manager.PermanentColors.Clone();
+        _boardColors = (PlayerColors[,])_permanentColors.Clone();
     }
 
     private void CleanBoard()
@@ -68,7 +73,7 @@ public class BoardScript : MonoBehaviour
                 
                 if (piece != null)
                 {
-                    if (_manager.PermanentColors[x, y] == PlayerColors.None) // a piece and not permanent
+                    if (_permanentColors[x, y] == PlayerColors.None) // a piece and not permanent
                     {
                         Destroy(piece.gameObject);
                     }
@@ -201,5 +206,17 @@ public class BoardScript : MonoBehaviour
     {
         _roundTurns++;
         shapeIcon.sprite = PlayerTurn == PlayerColors.Blue ? blueIcon : redIcon;
+    }
+
+    public void AddNewPermanent(PlayerColors color, Vector2Int permPos)
+    {
+        _permanentColors[permPos.x, permPos.y] = color;
+
+        _higlights[permPos.x, permPos.y] = true;
+        MeshRenderer meshRenderer = _pieces[permPos.x, permPos.y].GetComponent<MeshRenderer>();
+        meshRenderer.material = permanentMaterial;
+        Color actualColor = color == PlayerColors.Blue ? blueColor : redColor;
+        meshRenderer.material.color = actualColor;
+        meshRenderer.material.SetColor("_EmissionColor", actualColor);
     }
 }
