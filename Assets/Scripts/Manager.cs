@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum PlayerColors
@@ -75,12 +72,14 @@ public class Manager : MonoBehaviour
     /// </summary>
     public void EndRound()
     {
-        Debug.Log("Ended a round");
+        if (board.Ending) return;
         
+        Debug.Log("Ended a round");
+            
         PlayerColors color = board.PlayerTurn; // not last player turn because game is jank and "ahead"
         Vector2Int newPermPos = color == PlayerColors.Blue ? board.LastBlueCoords : board.LastRedCoords;
         AddNewPermanent(color, newPermPos);
-        
+            
         board.StartNewRound();
     }
 

@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,11 +15,13 @@ public class BoardScript : MonoBehaviour
     [SerializeField] private GameObject redPrefab;
     [SerializeField] private Color redColor = Color.red;
 
+    [SerializeField] private float waitAfterWin = 3f;
+
     [SerializeField] private Image shapeIcon;
     [SerializeField] private Sprite blueIcon;
     [SerializeField] private Sprite redIcon;
     
-    private Transform[,] _pieces = new Transform[3, 3];
+    private readonly Transform[,] _pieces = new Transform[3, 3];
     private PlayerColors[,] _boardColors = new PlayerColors[3, 3];
     public PlayerColors[,] BoardColors => _boardColors;
     
@@ -31,18 +30,24 @@ public class BoardScript : MonoBehaviour
     public Vector2Int LastRedCoords => _lastRedCoords;
     private Vector2Int _lastRedCoords;
 
+    public bool Ending => _ending;
+    private bool _ending;
+    
     private int _roundTurns;
     public PlayerColors PlayerTurn => _roundTurns % 2 == 1 ? PlayerColors.Blue : PlayerColors.Red;
 
     private Manager _manager;
-    
+
     private void Awake()
     {
         _manager = Manager.Main;
+        _ending = false;
     }
 
     public void StartNewRound()
     {
+        if (_ending) return;
+        
         IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
         CleanBoard();
         _boardColors = (PlayerColors[,])_manager.PermanentColors.Clone();
@@ -79,6 +84,8 @@ public class BoardScript : MonoBehaviour
     /// <param name="space"></param>
     public void PlacedShape(SpaceScript space)
     {
+        if (_ending) return;
+        
         // spawn prefab
         if (PlayerTurn == PlayerColors.Blue)
         {
@@ -97,7 +104,9 @@ public class BoardScript : MonoBehaviour
         
         if (CheckForWin())
         {
+            _ending = true;
             Debug.Log("A player has won this round.");
+            StartCoroutine(WinState());
         }
     }
 
@@ -116,10 +125,17 @@ public class BoardScript : MonoBehaviour
         material.color = PlayerTurn == PlayerColors.Blue ? blueColor : redColor;
     }
 
+    private IEnumerator WinState()
+    {
+        yield return new WaitForSeconds(waitAfterWin);
+        _ending = false;
+        _manager.EndRound();
+    }
+
     #region win check
     private bool CheckForWin()
     {
-        Debug.Log("! STARTED WIN CHECK");
+        // Debug.Log("! STARTED WIN CHECK");
         // algorithm checks for every space, then for every space around it. if space is filled, then check opposite.
         for (int x = 0; x < _boardColors.GetLength(0); x++)
         {
@@ -136,7 +152,7 @@ public class BoardScript : MonoBehaviour
     }
     private bool CheckDirectionsFromSpace(Vector2Int originCoords, PlayerColors color)
     {
-        Debug.Log($"Started check on space: {originCoords}");
+        // Debug.Log($"Started check on space: {originCoords}");
         // check 3x3 grid centered on space coords as a "direction"
         for (int x = -1; x <= 1; x++)
         {
@@ -149,7 +165,7 @@ public class BoardScript : MonoBehaviour
                 Vector2Int targetCoords = originCoords + offset;
                 Vector2Int oppositeCoords = originCoords - offset;
                 
-                Debug.Log($"Origin: {originCoords}, Target: {targetCoords}, Opposite: {oppositeCoords}");
+                // Debug.Log($"Origin: {originCoords}, Target: {targetCoords}, Opposite: {oppositeCoords}");
                 
                 if (!IsValidSpace(targetCoords)) continue;
                 if (!IsValidSpace(oppositeCoords)) continue;
@@ -173,8 +189,8 @@ public class BoardScript : MonoBehaviour
     private bool IsValidSpace(Vector2Int coords)
     {
         if (coords.x < 0 || coords.y < 0) return false;
-        if (coords.x > _boardColors.GetLength(0)) return false;
-        if (coords.y > _boardColors.GetLength(1)) return false;
+        if (coords.x >= _boardColors.GetLength(0)) return false;
+        if (coords.y >= _boardColors.GetLength(1)) return false;
         return true;
     }
     

@@ -993,7 +993,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 119
 --- !u!114 &1273651644
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1502,6 +1502,14 @@ PrefabInstance:
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: blueColor.r
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: vectorFucker.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: vectorFucker.y
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: nextPlayer.Array.size
