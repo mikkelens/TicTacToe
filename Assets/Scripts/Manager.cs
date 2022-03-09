@@ -21,7 +21,8 @@ public class Manager : MonoBehaviour
 
     // readonly is assuming only one metagame will be played
     // (metagames are the full funny thing, games are just normal tic tac toe type events)
-    private PlayerColors[,] _permanentColors = new PlayerColors[3, 3]; 
+    private readonly PlayerColors[,] _permanentColors = new PlayerColors[3, 3];
+    private readonly bool[,] _higlights = new bool[3, 3];
     public PlayerColors[,] PermanentColors => _permanentColors;
 
     private Manager() { }
@@ -73,7 +74,7 @@ public class Manager : MonoBehaviour
     public void EndRound()
     {
         if (board.Ending) return;
-        
+
         Debug.Log("Ended a round");
             
         PlayerColors color = board.PlayerTurn; // not last player turn because game is jank and "ahead"
@@ -85,7 +86,11 @@ public class Manager : MonoBehaviour
 
     private void AddNewPermanent(PlayerColors color, Vector2Int permPos)
     {
-        Debug.Log($"New permanent: {permPos - Vector2Int.one}");
         _permanentColors[permPos.x, permPos.y] = color;
+
+        _higlights[permPos.x, permPos.y] = true;
+        Material material = board.Pieces[permPos.x, permPos.y].GetComponent<MeshRenderer>().material;
+        material.SetColor("_EmissionColor", Color.white * board.Whiteness);
+        Debug.Log($"New permanent: {permPos - Vector2Int.one}");
     }
 }

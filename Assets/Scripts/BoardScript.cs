@@ -20,7 +20,10 @@ public class BoardScript : MonoBehaviour
     [SerializeField] private Image shapeIcon;
     [SerializeField] private Sprite blueIcon;
     [SerializeField] private Sprite redIcon;
+
+    public float Whiteness = 0.1f;
     
+    public Transform[,] Pieces => _pieces;
     private readonly Transform[,] _pieces = new Transform[3, 3];
     private PlayerColors[,] _boardColors = new PlayerColors[3, 3];
     public PlayerColors[,] BoardColors => _boardColors;

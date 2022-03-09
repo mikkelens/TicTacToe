@@ -1468,6 +1468,10 @@ PrefabInstance:
       value: BOARD
       objectReference: {fileID: 0}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: Witnes
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: redIcon
       value: 
       objectReference: {fileID: 21300000, guid: 6a052734788dedc4085d5670226ffaca, type: 3}
