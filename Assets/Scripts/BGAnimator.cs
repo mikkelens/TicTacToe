@@ -17,6 +17,6 @@ public class BGAnimator : MonoBehaviour
 
     public void OnRenderObject()
     {
-        BGM.SetTextureOffset("_MainTex", Direction * Speed * Time.timeSinceLevelLoad);
+        BGM.SetTextureOffset("_MainTex", Speed * Time.timeSinceLevelLoad * Direction);
     }
 }
