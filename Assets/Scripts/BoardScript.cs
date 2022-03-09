@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using Sirenix.OdinInspector;
 
 /// <summary>
 /// Script is used on each board, and a new board is spawned every round.
@@ -15,6 +17,12 @@ public class BoardScript : MonoBehaviour
     [SerializeField] private Color blueColor = Color.blue;
     [SerializeField] private GameObject redPrefab;
     [SerializeField] private Color redColor = Color.red;
+
+    [SerializeField] private Image shapeIcon;
+    [SerializeField] private Sprite blueIcon;
+    [SerializeField] private Sprite redIcon;
+    
+    [SerializeField] private Vector2 vectorFucker;
     
     private Manager _manager;
     
@@ -27,14 +35,17 @@ public class BoardScript : MonoBehaviour
     public Vector2Int LastRedCoords => _lastRedCoords;
 
     private int _roundTurns;
-    public PlayerColors PlayerTurn => _roundTurns % 2 == 0 ? PlayerColors.Blue : PlayerColors.Red;
-    public PlayerColors LastPlayerTurn => _roundTurns % 2 == 1 ? PlayerColors.Blue : PlayerColors.Red;
-    
-    public void StartNewRound()
+    public PlayerColors PlayerTurn => _roundTurns % 2 == 1 ? PlayerColors.Blue : PlayerColors.Red;
+
+    private void Awake()
     {
         _manager = Manager.Main;
+    }
+
+    public void StartNewRound()
+    {
+        IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
         CleanBoard();
-        //_roundTurns++;
         _boardColors = (PlayerColors[,])_manager.PermanentColors.Clone();
     }
 
@@ -83,7 +94,12 @@ public class BoardScript : MonoBehaviour
 
         // turn ends
         _boardColors[space.Coords.x, space.Coords.y] = PlayerTurn;
-        _roundTurns++;
+        IncrementTurn();
+        
+        if (CheckForWin())
+        {
+            Debug.Log("A player has won this round.");
+        }
     }
 
     private void SpawnShapeOnSpace(GameObject prefab, SpaceScript space)
@@ -99,5 +115,72 @@ public class BoardScript : MonoBehaviour
         
         Material material = shapeTransform.GetComponent<MeshRenderer>().material;
         material.color = PlayerTurn == PlayerColors.Blue ? blueColor : redColor;
+    }
+
+    #region win check
+    private bool CheckForWin()
+    {
+        Debug.Log("! STARTED WIN CHECK");
+        // algorithm checks for every space, then for every space around it. if space is filled, then check opposite.
+        for (int x = 0; x < _boardColors.GetLength(0); x++)
+        {
+            for (int y = 0; y < _boardColors.GetLength(1); y++)
+            {
+                PlayerColors spaceColor = _boardColors[x, y];
+                if (spaceColor == PlayerColors.None) continue;
+                
+                if (CheckDirectionsFromSpace(new Vector2Int(x, y), spaceColor))
+                    return true;
+            }
+        }
+        return false;
+    }
+    private bool CheckDirectionsFromSpace(Vector2Int originCoords, PlayerColors color)
+    {
+        Debug.Log($"Started check on space: {originCoords}");
+        // check 3x3 grid centered on space coords as a "direction"
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                // x and y are treated as direction vector components
+                if (x == 0 && y == 0) continue; // no direction is not a direction
+                
+                Vector2Int targetCoords = originCoords + new Vector2Int(x, y);
+                Vector2Int oppositeCoords = -targetCoords;
+                
+                Debug.Log($"Origin: {originCoords}, Target: {targetCoords}, Opposite: {oppositeCoords}");
+                
+                if (!IsValidSpace(targetCoords)) continue;
+                if (!IsValidSpace(oppositeCoords)) continue;
+                
+                if (CheckInDirection(targetCoords, oppositeCoords, color))
+                    return true;
+            }
+        }
+        return false;
+    }
+    private bool CheckInDirection(Vector2Int target, Vector2Int opposite, PlayerColors originColor)
+    {
+        PlayerColors targetColor = _boardColors[target.x, target.y];
+        PlayerColors oppositeColor = _boardColors[opposite.x, opposite.y];
+
+        if (targetColor != originColor) return false; // target space is not same originCoords space
+        return targetColor == oppositeColor; // if target space is same as opposite space
+    }
+    #endregion
+
+    private bool IsValidSpace(Vector2Int coords)
+    {
+        if (coords.x < 0 || coords.y < 0) return false;
+        if (coords.x > _boardColors.GetLength(0)) return false;
+        if (coords.y > _boardColors.GetLength(1)) return false;
+        return true;
+    }
+    
+    private void IncrementTurn()
+    {
+        _roundTurns++;
+        shapeIcon.sprite = PlayerTurn == PlayerColors.Blue ? blueIcon : redIcon;
     }
 }
