@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
-using Sirenix.OdinInspector;
 
 /// <summary>
 /// Script is used on each board, and a new board is spawned every round.
@@ -22,10 +22,6 @@ public class BoardScript : MonoBehaviour
     [SerializeField] private Sprite blueIcon;
     [SerializeField] private Sprite redIcon;
     
-    [SerializeField] private Vector2 vectorFucker;
-    
-    private Manager _manager;
-    
     private Transform[,] _pieces = new Transform[3, 3];
     private PlayerColors[,] _boardColors = new PlayerColors[3, 3];
     public PlayerColors[,] BoardColors => _boardColors;
@@ -37,6 +33,8 @@ public class BoardScript : MonoBehaviour
     private int _roundTurns;
     public PlayerColors PlayerTurn => _roundTurns % 2 == 1 ? PlayerColors.Blue : PlayerColors.Red;
 
+    private Manager _manager;
+    
     private void Awake()
     {
         _manager = Manager.Main;
@@ -145,9 +143,10 @@ public class BoardScript : MonoBehaviour
             {
                 // x and y are treated as direction vector components
                 if (x == 0 && y == 0) continue; // no direction is not a direction
-                
-                Vector2Int targetCoords = originCoords + new Vector2Int(x, y);
-                Vector2Int oppositeCoords = -targetCoords;
+
+                Vector2Int offset = new Vector2Int(x, y);
+                Vector2Int targetCoords = originCoords + offset;
+                Vector2Int oppositeCoords = originCoords - offset;
                 
                 Debug.Log($"Origin: {originCoords}, Target: {targetCoords}, Opposite: {oppositeCoords}");
                 
