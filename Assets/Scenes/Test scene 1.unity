@@ -664,7 +664,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Mat: {fileID: 2100000, guid: ecf21b72a1e3cf24d8c02614be8ae9b2, type: 2}
-  PixelDesity: 200
+  PixelDesity: 120
 --- !u!1 &1070970022
 GameObject:
   m_ObjectHideFlags: 0
@@ -1026,7 +1026,7 @@ Canvas:
   m_GameObject: {fileID: 1273651641}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 1
+  m_RenderMode: 0
   m_Camera: {fileID: 963194227}
   m_PlaneDistance: 100
   m_PixelPerfect: 1
