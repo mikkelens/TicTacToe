@@ -12,6 +12,8 @@ public enum PlayerColors
 
 public class Manager : MonoBehaviour
 {
+    public static Manager Main;
+    
     [Header("Settings")]
     [SerializeField] private BoardScript board;
     [SerializeField] private Transform piecesParentParent;
@@ -25,11 +27,10 @@ public class Manager : MonoBehaviour
     private PlayerColors[,] _permanentColors = new PlayerColors[3, 3]; 
     public PlayerColors[,] PermanentColors => _permanentColors;
 
-    private Manager() { } // makes this class not instancabile out of scope
-
     private void Awake()
     {
         if (piecesParentParent == null) piecesParentParent = transform;
+        Main = this; // assuming there is only one
         _cam = Camera.main;
     }
 
