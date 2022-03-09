@@ -32,7 +32,7 @@ public class BoardScript : MonoBehaviour
     
     public void StartNewRound()
     {
-        _manager = Manager.Main;
+        _manager = Manager.@this;
         CleanBoard();
         //_roundTurns++;
         _boardColors = (PlayerColors[,])_manager.PermanentColors.Clone();
