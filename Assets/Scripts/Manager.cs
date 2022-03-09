@@ -27,6 +27,8 @@ public class Manager : MonoBehaviour
     private PlayerColors[,] _permanentColors = new PlayerColors[3, 3]; 
     public PlayerColors[,] PermanentColors => _permanentColors;
 
+    private Manager() { }
+
     private void Awake()
     {
         if (piecesParentParent == null) piecesParentParent = transform;
