@@ -25,10 +25,11 @@ public class BoardScript : MonoBehaviour
     private Transform[,] _pieces = new Transform[3, 3];
     private PlayerColors[,] _boardColors = new PlayerColors[3, 3];
     public PlayerColors[,] BoardColors => _boardColors;
-    private Vector2Int _lastBlueCoords;
+    
     public Vector2Int LastBlueCoords => _lastBlueCoords;
-    private Vector2Int _lastRedCoords;
+    private Vector2Int _lastBlueCoords;
     public Vector2Int LastRedCoords => _lastRedCoords;
+    private Vector2Int _lastRedCoords;
 
     private int _roundTurns;
     public PlayerColors PlayerTurn => _roundTurns % 2 == 1 ? PlayerColors.Blue : PlayerColors.Red;
