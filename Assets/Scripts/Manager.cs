@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Manager : MonoBehaviour
 {
@@ -39,14 +40,20 @@ public class Manager : MonoBehaviour
         {
             RaycastForSpaceOnMouse();
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            // jank but eh lmao
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
     }
 
     private void RaycastForSpaceOnMouse()
     {
         // raycast on space, call spacescript.pressspace with board
-        const string Layer = "Space";
+        const string layer = "Space";
 
-        int mask = LayerMask.GetMask(Layer);
+        int mask = LayerMask.GetMask(layer);
         if (Physics.Raycast(_cam.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, Mathf.Infinity, mask))
         {
             SpaceScript space = hit.transform.GetComponent<SpaceScript>();
