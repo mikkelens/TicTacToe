@@ -52,23 +52,24 @@ public class BoardScript : MonoBehaviour
     
     private PlayerColor PlayerTurn => _roundTurns % 2 == 1 ? PlayerColor.Blue : PlayerColor.Red;
 
-    private BoardScript() 
-    {
-        // question for rolf: when is this supposed to be used
-        
-        for (int x = 0; x < Pieces.GetLength(0); x++)
-        {
-            for (int y = 0; y < Pieces.GetLength(1); y++)
-            {
-                Pieces[x, y] = default;
-            }
-        }
-    }
+    private BoardScript() { }
 
     private void Awake()
     {
+        InizializePieces();
         _manager = Manager.Main;
         _ending = false;
+
+        void InizializePieces()
+        {
+            for (int x = 0; x < Pieces.GetLength(0); x++)
+            {
+                for (int y = 0; y < Pieces.GetLength(1); y++)
+                {
+                    Pieces[x, y] = new PieceData();
+                }
+            }
+        }
     }
 
     public void StartNewRound()
@@ -77,9 +78,12 @@ public class BoardScript : MonoBehaviour
         
         IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
         CleanBoard();
-        foreach (var p in Pieces)
+        for (int x = 0; x < Pieces.GetLength(0); x++)
         {
-            p.BoardColor = p.PermanentColor;
+            for (int y = 0; y < Pieces.GetLength(1); y++)
+            {
+                Pieces[x, y].BoardColor = Pieces[x, y].PermanentColor; 
+            }
         }
     }
 
