@@ -33,7 +33,7 @@ Shader "Custom/Outline"
         half _Glossiness;
         half _Metallic;
 
-        fixed _OutlineRadius;
+        float _OutlineRadius;
 
 
         UNITY_INSTANCING_BUFFER_START(Props)
@@ -52,6 +52,29 @@ Shader "Custom/Outline"
             o.Alpha = c.a;
         }
         ENDCG
+
+        pass
+        {
+            Cull front
+
+            CGPROGRAM
+            #pragma vertex Vertex
+            #pragma frag Frag
+
+            float _OutlineRadius;
+
+            float4 Vertex(float4 position : POSITION, float3 normal : NORMAL)
+            {
+                position.xyz += _OutlineRadius * normal
+
+                return UnityObjectToClipPos(position);
+            }
+
+            half4 Frag() : SV_TARGET
+            {
+                return UNITY_ACCESS_INSTANCED_PROP(Props, _OutlineColor);
+            }
+        };
     }
     FallBack "Diffuse"
 }
