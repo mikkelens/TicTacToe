@@ -63,18 +63,35 @@ public class BoardScript : MonoBehaviour
     public void StartNewRound()
     {
         if (_ending) return;
-        
+
+        // if (InfiniteWin())
+        // {
+        //     MetaWin();
+        //     return;
+        // }
         IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
         CleanBoard();
-        for (int x = 0; x < Pieces.GetLength(0); x++)
-        {
-            for (int y = 0; y < Pieces.GetLength(1); y++)
-            {
-                Pieces[x, y].BoardColor = Pieces[x, y].PermanentColor; 
-            }
-        }
     }
 
+
+    // private bool InfiniteWin()
+    // {
+    //     for (int x = 0; x < Pieces.GetLength(0); x++)
+    //     {
+    //         for (int y = 0; y < Pieces.GetLength(1); y++)
+    //         {
+    //             PieceData piece = Pieces[x, y];
+    //         }
+    //     }
+    //     
+    //     return false;
+    // }
+
+    private void MetaWin()
+    {
+        throw new System.NotImplementedException();
+    }
+    
     private void CleanBoard()
     {
         for (int x = 0; x < Pieces.GetLength(0); x++)
@@ -86,7 +103,7 @@ public class BoardScript : MonoBehaviour
                 
                 if (piece != null)
                 {
-                    if (Pieces[x, y].PermanentColor != PlayerColor.None) continue;
+                    if (Pieces[x, y].IsPermanent) continue;
                     
                     Pieces[x, y].Piece = null;
                     Destroy(piece.gameObject);
@@ -119,7 +136,7 @@ public class BoardScript : MonoBehaviour
         Pieces[space.Coords.x, space.Coords.y].BoardColor = PlayerTurn;
         IncrementTurn();
 
-        EndState endState = CheckForEnd();
+        EndState endState = CheckForWin();
         if (endState != EndState.Continue)
         {
             _ending = true;
@@ -148,7 +165,6 @@ public class BoardScript : MonoBehaviour
         material.color = CurrentPlayer.color;
     }
 
-
     #region win/end check
     enum EndState
     {
@@ -156,14 +172,13 @@ public class BoardScript : MonoBehaviour
         Win,
         Draw
     }
-    
     /// <summary>
     /// Checks if game ends.
     /// </summary>
     /// <returns>
     /// The end state that should be used.
     /// </returns>
-    private EndState CheckForEnd()
+    private EndState CheckForWin()
     {
         // algorithm checks for every space
         int spacesFilled = 0;
@@ -191,7 +206,6 @@ public class BoardScript : MonoBehaviour
         return EndState.Continue;
 
     }
-
     #region win check
     private bool CheckDirectionsFromSpace(Vector2Int originCoords, PlayerColor color)
     {
@@ -267,13 +281,13 @@ public class BoardScript : MonoBehaviour
 
         PlayerColor color = PlayerTurn; // not last player turn because game is jank and "ahead"
         Vector2Int newPermPos = color == PlayerColor.Blue ? LastBlueCoords : LastRedCoords;
-        AddNewPermanent(color, newPermPos);
+        AddNewPermanent(newPermPos);
         StartNewRound();
     }
 
-    private void AddNewPermanent(PlayerColor color, Vector2Int permPos)
+    private void AddNewPermanent(Vector2Int permPos)
     {
-        Pieces[permPos.x, permPos.y].PermanentColor = color;
+        Pieces[permPos.x, permPos.y].IsPermanent = true;
 
         Pieces[permPos.x, permPos.y].IsHigligthed = true;
         Transform piece = Pieces[permPos.x, permPos.y].Piece;

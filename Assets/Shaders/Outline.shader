@@ -65,16 +65,18 @@ Shader "Custom/Outline"
 
             float4 Vertex(float4 position : POSITION, float3 normal : NORMAL)
             {
-                position.xyz += _OutlineRadius * normal
+                position.xyz += _OutlineRadius * normal;
 
                 return UnityObjectToClipPos(position);
             }
+
+            int _OutlineColor;
 
             half4 Frag() : SV_TARGET
             {
                 return UNITY_ACCESS_INSTANCED_PROP(Props, _OutlineColor);
             }
-        };
+        }
         ENDCG
     }
 }
