@@ -12,19 +12,11 @@ public class BoardScript : MonoBehaviour
     [SerializeField] private float verticalSpawnDistance = 6f;
     [SerializeField] private float waitAfterWin = 3f;
     
-    // use this
     [SerializeField] private PlayerData bluePlayer;
     [SerializeField] private PlayerData redPlayer;
-    
-    // remove these
-    // [SerializeField] private GameObject bluePrefab;
-    // [SerializeField] private GameObject redPrefab;
-    // [SerializeField] private Color blueColor = Color.blue;
-    // [SerializeField] private Color redColor = Color.red;
-    
+
     [SerializeField] private Material permanentMaterial;
-
-
+    
     [SerializeField] private Image shapeIcon;
     [SerializeField] private Sprite blueIcon;
     [SerializeField] private Sprite redIcon;
