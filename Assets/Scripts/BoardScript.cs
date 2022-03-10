@@ -2,21 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-#region data types
-class PlayerData : ScriptableObject
-{
-    public GameObject prefab;
-    public Color color;
-    public Sprite icon;
-}
-public enum PlayerColor
-{
-    None,
-    Blue,
-    Red
-}
-#endregion
-
 /// <summary>
 /// Script is used on each board, and a new board is spawned every round.
 /// </summary>
