@@ -64,28 +64,49 @@ public class BoardScript : MonoBehaviour
     {
         if (_ending) return;
 
-        // if (InfiniteWin())
-        // {
-        //     MetaWin();
-        //     return;
-        // }
+        if (InfiniteWin())
+        {
+            MetaWin();
+            return;
+        }
         IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
         CleanBoard();
     }
 
 
-    // private bool InfiniteWin()
-    // {
-    //     for (int x = 0; x < Pieces.GetLength(0); x++)
-    //     {
-    //         for (int y = 0; y < Pieces.GetLength(1); y++)
-    //         {
-    //             PieceData piece = Pieces[x, y];
-    //         }
-    //     }
-    //     
-    //     return false;
-    // }
+    private bool InfiniteWin()
+    {
+        int spacesFilled = 0;
+        for (int x = 0; x < Pieces.GetLength(0); x++)
+        {
+            for (int y = 0; y < Pieces.GetLength(1); y++)
+            {
+                PieceData piece = Pieces[x, y];
+
+                if (!piece.IsPermanent || piece.ColorType == PlayerColor.None) continue;
+
+                spacesFilled++;
+                
+                // check for anything next to it
+                
+            }
+        }
+        
+        return false;
+    }
+
+    private PieceData[] GetSurroundingPieces(Vector2Int origin, bool permanentOnly)
+    {
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                if (x == 0 && y == 0) continue;
+            }
+        }
+        
+        return null;
+    }
 
     private void MetaWin()
     {
@@ -98,7 +119,7 @@ public class BoardScript : MonoBehaviour
         {
             for (int y = 0; y < Pieces.GetLength(1); y++)
             {
-                Pieces[x, y].BoardColor = PlayerColor.None;
+                Pieces[x, y].ColorType = PlayerColor.None;
                 Transform piece = Pieces[x, y].Piece;
                 
                 if (piece != null)
@@ -133,7 +154,7 @@ public class BoardScript : MonoBehaviour
         }
 
         // turn ends
-        Pieces[space.Coords.x, space.Coords.y].BoardColor = PlayerTurn;
+        Pieces[space.Coords.x, space.Coords.y].ColorType = PlayerTurn;
         IncrementTurn();
 
         EndState endState = CheckForWin();
@@ -186,7 +207,7 @@ public class BoardScript : MonoBehaviour
         {
             for (int y = 0; y < Pieces.GetLength(1); y++)
             {
-                PlayerColor spaceColor = Pieces[x, y].BoardColor;
+                PlayerColor spaceColor = Pieces[x, y].ColorType;
                 if (spaceColor == PlayerColor.None) continue;
              
                 spacesFilled++;
@@ -242,8 +263,8 @@ public class BoardScript : MonoBehaviour
     /// <returns></returns>
     private bool CheckInDirection(Vector2Int target, Vector2Int opposite, PlayerColor originColor)
     {
-        PlayerColor targetColor = Pieces[target.x, target.y].BoardColor;
-        PlayerColor oppositeColor = Pieces[opposite.x, opposite.y].BoardColor;
+        PlayerColor targetColor = Pieces[target.x, target.y].ColorType;
+        PlayerColor oppositeColor = Pieces[opposite.x, opposite.y].ColorType;
         
         if (targetColor != originColor) return false; // target space is not same originCoords space
         return targetColor == oppositeColor; // if target space is same as opposite space

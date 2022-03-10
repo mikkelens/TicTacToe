@@ -51,9 +51,9 @@ public class Manager : MonoBehaviour
     private void RaycastForSpaceOnMouse()
     {
         // raycast on space, call spacescript.pressspace with board
-        const string Layer = "Space";
+        const string layer = "Space";
 
-        int mask = LayerMask.GetMask(Layer);
+        int mask = LayerMask.GetMask(layer);
         if (Physics.Raycast(_cam.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, Mathf.Infinity, mask))
         {
             SpaceScript space = hit.transform.GetComponent<SpaceScript>();
