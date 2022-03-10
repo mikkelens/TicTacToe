@@ -6,7 +6,8 @@ public class Manager : MonoBehaviour
     public static Manager Main;
     
     [Header("Settings")]
-    [SerializeField] private BoardScript board;
+    [SerializeField]
+    public BoardScript board;
     [SerializeField] private Transform piecesParentParent;
     public Transform PiecesParent => piecesParentParent;
     
@@ -50,16 +51,20 @@ public class Manager : MonoBehaviour
 
     private void RaycastForSpaceOnMouse()
     {
-        // raycast on space, call spacescript.pressspace with board
-        const string layer = "Space";
+        // raycast on spaceData, call spacescript.pressspace with board
+        const string layer = "SpaceData";
 
         int mask = LayerMask.GetMask(layer);
         if (Physics.Raycast(_cam.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, Mathf.Infinity, mask))
         {
-            SpaceScript space = hit.transform.GetComponent<SpaceScript>();
-            if (space != null)
+            SpaceScript spaceScript = hit.transform.GetComponent<SpaceScript>();
+            if (spaceScript != null)
             {
-                space.SpacePressed(board);
+                SpaceData spaceData = spaceScript.SpaceData;
+                if (spaceData.CurrentPieceData == null)
+                {
+                    board.PlaceShape(spaceData);
+                }
             }
         }
     }
