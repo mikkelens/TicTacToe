@@ -60,7 +60,7 @@ public class BoardScript : MonoBehaviour
     public void StartNewRound()
     {
         if (_ending) return;
-        
+
         IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
         CleanBoard();
         for (int x = 0; x < Pieces.GetLength(0); x++)
