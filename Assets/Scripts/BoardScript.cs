@@ -10,19 +10,29 @@ public class BoardScript : MonoBehaviour
     [Header("Settings")] // assigned in prefab
     // [SerializeField] private float horizontalSpawnDistance = 4f;
     [SerializeField] private float verticalSpawnDistance = 6f;
-    [SerializeField] private GameObject bluePrefab;
-    [SerializeField] private GameObject redPrefab;
-    [SerializeField] private Color blueColor = Color.blue;
-    [SerializeField] private Color redColor = Color.red;
+    [SerializeField] private float waitAfterWin = 3f;
+    
+    // use this
+    [SerializeField] private PlayerData bluePlayer;
+    [SerializeField] private PlayerData redPlayer;
+    
+    // remove these
+    // [SerializeField] private GameObject bluePrefab;
+    // [SerializeField] private GameObject redPrefab;
+    // [SerializeField] private Color blueColor = Color.blue;
+    // [SerializeField] private Color redColor = Color.red;
+    
     [SerializeField] private Material permanentMaterial;
 
-    [SerializeField] private float waitAfterWin = 3f;
 
     [SerializeField] private Image shapeIcon;
     [SerializeField] private Sprite blueIcon;
     [SerializeField] private Sprite redIcon;
     // public float Whiteness = 0.1f;
 
+    private PlayerData B => bluePlayer;
+    private PlayerData R => redPlayer;
+    
     public readonly PieceData[,] Pieces = new PieceData[3, 3];
 
     private Vector2Int LastBlueCoords => _lastBlueCoords;
@@ -36,6 +46,7 @@ public class BoardScript : MonoBehaviour
     private Manager _manager;
     
     private PlayerColor PlayerTurn => _roundTurns % 2 == 1 ? PlayerColor.Blue : PlayerColor.Red;
+    private PlayerData CurrentPlayer => _roundTurns % 2 == 1 ? B : R;
 
     private BoardScript() { }
 
@@ -56,10 +67,10 @@ public class BoardScript : MonoBehaviour
             }
         }
     }
-
-    public void StartNewRound()
+    
+    public void StartNewRound(bool yes = false)
     {
-        if (_ending) return;
+        if (_ending && yes) return;
         
         IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
         CleanBoard();
@@ -103,12 +114,12 @@ public class BoardScript : MonoBehaviour
         // spawn prefab
         if (PlayerTurn == PlayerColor.Blue)
         {
-            SpawnShapeOnSpace(bluePrefab, space);
+            SpawnShapeOnSpace(B.prefab, space);
             _lastBlueCoords = space.Coords;
         }
         else
         {
-            SpawnShapeOnSpace(redPrefab, space);
+            SpawnShapeOnSpace(R.prefab, space);
             _lastRedCoords = space.Coords;
         }
 
@@ -125,6 +136,11 @@ public class BoardScript : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Physically spawns a shape in the world on the space provided.
+    /// </summary>
+    /// <param name="prefab"></param>
+    /// <param name="space"></param>
     private void SpawnShapeOnSpace(GameObject prefab, SpaceScript space)
     {
         Vector3 verticalOffset = Vector3.up * verticalSpawnDistance;
@@ -137,7 +153,7 @@ public class BoardScript : MonoBehaviour
         Pieces[coords.x, coords.y].Piece = shapeTransform;
         
         Material material = shapeTransform.GetComponent<MeshRenderer>().material;
-        material.color = PlayerTurn == PlayerColor.Blue ? blueColor : redColor;
+        material.color = CurrentPlayer.color;
     }
 
 
@@ -148,6 +164,13 @@ public class BoardScript : MonoBehaviour
         Win,
         Draw
     }
+    
+    /// <summary>
+    /// Checks if game ends.
+    /// </summary>
+    /// <returns>
+    /// The end state that should be used.
+    /// </returns>
     private EndState CheckForEnd()
     {
         // algorithm checks for every space
@@ -264,8 +287,7 @@ public class BoardScript : MonoBehaviour
         Transform piece = Pieces[permPos.x, permPos.y].Piece;
         MeshRenderer meshRenderer = piece.GetComponent<MeshRenderer>();
         meshRenderer.material = permanentMaterial;
-        Color actualColor = color == PlayerColor.Blue ? blueColor : redColor;
-        meshRenderer.material.color = actualColor;
-        meshRenderer.material.SetColor("_EmissionColor", actualColor);
+        meshRenderer.material.color = CurrentPlayer.color;
+        meshRenderer.material.SetColor("_EmissionColor", CurrentPlayer.color);
     }
 }
