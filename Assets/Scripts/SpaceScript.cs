@@ -9,7 +9,7 @@ public class SpaceScript : MonoBehaviour
     // called by raycast
     public void SpacePressed(BoardScript board)
     {
-        if (board.BoardColors[Coords.x, Coords.y] != PlayerColors.None) return;
+        if (board.Pieces[Coords.x, Coords.y].BordColor != PlayerColor.None) return;
 
         // Debug.Log($"Pressed space called {name}");
         board.PlacedShape(this);

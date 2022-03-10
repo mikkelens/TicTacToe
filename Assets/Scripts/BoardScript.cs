@@ -22,13 +22,8 @@ public class BoardScript : MonoBehaviour
     [SerializeField] private Sprite blueIcon;
     [SerializeField] private Sprite redIcon;
     // public float Whiteness = 0.1f;
-    
-    private readonly bool[,] _higlights = new bool[3, 3];
-    private readonly PlayerColors[,] _permanentColors = new PlayerColors[3, 3];
-    
-    private readonly Transform[,] _pieces = new Transform[3, 3];
-    private PlayerColors[,] _boardColors = new PlayerColors[3, 3];
-    public PlayerColors[,] BoardColors => _boardColors;
+
+    public readonly PieceData[,] Pieces = new PieceData[3, 3];
 
     private Vector2Int LastBlueCoords => _lastBlueCoords;
     private Vector2Int _lastBlueCoords;
@@ -40,7 +35,18 @@ public class BoardScript : MonoBehaviour
 
     private Manager _manager;
     
-    private PlayerColors PlayerTurn => _roundTurns % 2 == 1 ? PlayerColors.Blue : PlayerColors.Red;
+    private PlayerColor PlayerTurn => _roundTurns % 2 == 1 ? PlayerColor.Blue : PlayerColor.Red;
+
+    private BoardScript() 
+    {
+        for (int x = 0; x < Pieces.GetLength(0); x++)
+        {
+            for (int y = 0; y < Pieces.GetLength(1); y++)
+            {
+                Pieces[x, y] = new PieceData();
+            }
+        }
+    }
 
     private void Awake()
     {
@@ -54,23 +60,26 @@ public class BoardScript : MonoBehaviour
         
         IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
         CleanBoard();
-        _boardColors = (PlayerColors[,])_permanentColors.Clone();
+        foreach (var p in Pieces)
+        {
+            p.BordColor = p.PermanentColor;
+        }
     }
 
     private void CleanBoard()
     {
-        for (int x = 0; x < _boardColors.GetLength(0); x++)
+        for (int x = 0; x < Pieces.GetLength(0); x++)
         {
-            for (int y = 0; y < _boardColors.GetLength(1); y++)
+            for (int y = 0; y < Pieces.GetLength(1); y++)
             {
-                _boardColors[x, y] = PlayerColors.None;
-                Transform piece = _pieces[x, y];
+                Pieces[x, y].BordColor = PlayerColor.None;
+                Transform piece = Pieces[x, y].Piece;
                 
                 if (piece != null)
                 {
-                    if (_permanentColors[x, y] != PlayerColors.None) continue;
+                    if (Pieces[x, y].PermanentColor != PlayerColor.None) continue;
                     
-                    _pieces[x, y] = null;
+                    Pieces[x, y].Piece = null;
                     Destroy(piece.gameObject);
                 }
             }
@@ -86,7 +95,7 @@ public class BoardScript : MonoBehaviour
         if (_ending) return;
         
         // spawn prefab
-        if (PlayerTurn == PlayerColors.Blue)
+        if (PlayerTurn == PlayerColor.Blue)
         {
             SpawnShapeOnSpace(bluePrefab, space);
             _lastBlueCoords = space.Coords;
@@ -98,7 +107,7 @@ public class BoardScript : MonoBehaviour
         }
 
         // turn ends
-        _boardColors[space.Coords.x, space.Coords.y] = PlayerTurn;
+        Pieces[space.Coords.x, space.Coords.y].BordColor = PlayerTurn;
         IncrementTurn();
         
         if (CheckForWin())
@@ -117,10 +126,10 @@ public class BoardScript : MonoBehaviour
         shapeTransform.parent = _manager.PiecesParent; // set in a parent (for editor convenience)
         
         Vector2Int coords = space.Coords;
-        _pieces[coords.x, coords.y] = shapeTransform;
+        Pieces[coords.x, coords.y].Piece = shapeTransform;
         
         Material material = shapeTransform.GetComponent<MeshRenderer>().material;
-        material.color = PlayerTurn == PlayerColors.Blue ? blueColor : redColor;
+        material.color = PlayerTurn == PlayerColor.Blue ? blueColor : redColor;
     }
 
     private IEnumerator WinState()
@@ -136,13 +145,13 @@ public class BoardScript : MonoBehaviour
         int filled = 0;
         // Debug.Log("! STARTED WIN CHECK");
         // algorithm checks for every space, then for every space around it. if space is filled, then check opposite.
-        for (int x = 0; x < _boardColors.GetLength(0); x++)
+        for (int x = 0; x < Pieces.GetLength(0); x++)
         {
-            for (int y = 0; y < _boardColors.GetLength(1); y++)
+            for (int y = 0; y < Pieces.GetLength(1); y++)
             {
                 
-                PlayerColors spaceColor = _boardColors[x, y];
-                if (spaceColor == PlayerColors.None) continue;
+                PlayerColor spaceColor = Pieces[x, y].BordColor;
+                if (spaceColor == PlayerColor.None) continue;
                 filled++;
                 
                 if (CheckDirectionsFromSpace(new Vector2Int(x, y), spaceColor))
@@ -151,7 +160,7 @@ public class BoardScript : MonoBehaviour
         }
         return false;
     }
-    private bool CheckDirectionsFromSpace(Vector2Int originCoords, PlayerColors color)
+    private bool CheckDirectionsFromSpace(Vector2Int originCoords, PlayerColor color)
     {
         // check 3x3 grid centered on space coords as a "direction"
         for (int x = -1; x <= 1; x++)
@@ -176,10 +185,10 @@ public class BoardScript : MonoBehaviour
         }
         return false;
     }
-    private bool CheckInDirection(Vector2Int target, Vector2Int opposite, PlayerColors originColor)
+    private bool CheckInDirection(Vector2Int target, Vector2Int opposite, PlayerColor originColor)
     {
-        PlayerColors targetColor = _boardColors[target.x, target.y];
-        PlayerColors oppositeColor = _boardColors[opposite.x, opposite.y];
+        PlayerColor targetColor = Pieces[target.x, target.y].BordColor;
+        PlayerColor oppositeColor = Pieces[opposite.x, opposite.y].BordColor;
 
         if (targetColor != originColor) return false; // target space is not same originCoords space
         return targetColor == oppositeColor; // if target space is same as opposite space
@@ -189,15 +198,15 @@ public class BoardScript : MonoBehaviour
     private bool IsValidSpace(Vector2Int coords)
     {
         if (coords.x < 0 || coords.y < 0) return false;
-        if (coords.x >= _boardColors.GetLength(0)) return false;
-        if (coords.y >= _boardColors.GetLength(1)) return false;
+        if (coords.x >= Pieces.GetLength(0)) return false;
+        if (coords.y >= Pieces.GetLength(1)) return false;
         return true;
     }
     
     private void IncrementTurn()
     {
         _roundTurns++;
-        shapeIcon.sprite = PlayerTurn == PlayerColors.Blue ? blueIcon : redIcon;
+        shapeIcon.sprite = PlayerTurn == PlayerColor.Blue ? blueIcon : redIcon;
     }
     
     /// <summary>
@@ -207,20 +216,21 @@ public class BoardScript : MonoBehaviour
     {
         if (_ending) return;
 
-        PlayerColors color = PlayerTurn; // not last player turn because game is jank and "ahead"
-        Vector2Int newPermPos = color == PlayerColors.Blue ? LastBlueCoords : LastRedCoords;
+        PlayerColor color = PlayerTurn; // not last player turn because game is jank and "ahead"
+        Vector2Int newPermPos = color == PlayerColor.Blue ? LastBlueCoords : LastRedCoords;
         AddNewPermanent(color, newPermPos);
         StartNewRound();
     }
 
-    private void AddNewPermanent(PlayerColors color, Vector2Int permPos)
+    private void AddNewPermanent(PlayerColor color, Vector2Int permPos)
     {
-        _permanentColors[permPos.x, permPos.y] = color;
+        Pieces[permPos.x, permPos.y].PermanentColor = color;
 
-        _higlights[permPos.x, permPos.y] = true;
-        MeshRenderer meshRenderer = _pieces[permPos.x, permPos.y].GetComponent<MeshRenderer>();
+        Pieces[permPos.x, permPos.y].IsHigligthed = true;
+        Transform piece = Pieces[permPos.x, permPos.y].Piece;
+        MeshRenderer meshRenderer = piece.GetComponent<MeshRenderer>();
         meshRenderer.material = permanentMaterial;
-        Color actualColor = color == PlayerColors.Blue ? blueColor : redColor;
+        Color actualColor = color == PlayerColor.Blue ? blueColor : redColor;
         meshRenderer.material.color = actualColor;
         meshRenderer.material.SetColor("_EmissionColor", actualColor);
     }

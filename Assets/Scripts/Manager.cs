@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum PlayerColors
+public enum PlayerColor
 {
     None,
     Blue,
