@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Manager : MonoBehaviour
 {
@@ -38,6 +39,12 @@ public class Manager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             RaycastForSpaceOnMouse();
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            // jank but eh lmao
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 

@@ -3,7 +3,7 @@
 public class PieceData
 {
     public Transform Piece;
-    public PlayerColor PermanentColor;
+    public bool IsPermanent;
     public PlayerColor BoardColor;
     public bool IsHigligthed = false;
     public PieceData() { }
