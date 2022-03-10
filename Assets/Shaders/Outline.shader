@@ -59,7 +59,7 @@ Shader "Custom/Outline"
 
             CGPROGRAM
             #pragma vertex Vertex
-            #pragma frag Frag
+            #pragma fragment Frag
 
             float _OutlineRadius;
 
@@ -75,6 +75,6 @@ Shader "Custom/Outline"
                 return UNITY_ACCESS_INSTANCED_PROP(Props, _OutlineColor);
             }
         };
+        ENDCG
     }
-    FallBack "Diffuse"
 }
