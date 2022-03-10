@@ -27,7 +27,7 @@ public class Manager : MonoBehaviour
     }
 
     // potentially called by button?, but always called on scene load
-    public void RestartGame()
+    private void RestartGame()
     {
         // Debug.Log("Started a new game.");
         board.StartNewRound(); // start round with empty board
