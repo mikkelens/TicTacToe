@@ -110,10 +110,10 @@ public class BoardScript : MonoBehaviour
         Pieces[space.Coords.x, space.Coords.y].BordColor = PlayerTurn;
         IncrementTurn();
         
-        if (CheckForWin())
+        if (CheckForEnd())
         {
             _ending = true;
-            StartCoroutine(WinState());
+            StartCoroutine(WinRoutine());
         }
     }
 
@@ -132,15 +132,17 @@ public class BoardScript : MonoBehaviour
         material.color = PlayerTurn == PlayerColor.Blue ? blueColor : redColor;
     }
 
-    private IEnumerator WinState()
-    {
-        yield return new WaitForSeconds(waitAfterWin);
-        _ending = false;
-        EndRound();
-    }
 
-    #region win check
-    private bool CheckForWin()
+    #region win/end check
+
+    enum EndState // refactor CheckForEnd to use this
+    {
+        Continue,
+        BlueWin,
+        RedWin,
+        Draw
+    }
+    private bool CheckForEnd()
     {
         int filled = 0;
         // Debug.Log("! STARTED WIN CHECK");
@@ -207,6 +209,13 @@ public class BoardScript : MonoBehaviour
     {
         _roundTurns++;
         shapeIcon.sprite = PlayerTurn == PlayerColor.Blue ? blueIcon : redIcon;
+    }
+    
+    private IEnumerator WinRoutine()
+    {
+        yield return new WaitForSeconds(waitAfterWin);
+        _ending = false;
+        EndRound();
     }
     
     /// <summary>
