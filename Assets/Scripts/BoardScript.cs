@@ -2,6 +2,21 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+#region data types
+class PlayerData : ScriptableObject
+{
+    public GameObject prefab;
+    public Color color;
+    public Sprite icon;
+}
+public enum PlayerColor
+{
+    None,
+    Blue,
+    Red
+}
+#endregion
+
 /// <summary>
 /// Script is used on each board, and a new board is spawned every round.
 /// </summary>
@@ -39,11 +54,13 @@ public class BoardScript : MonoBehaviour
 
     private BoardScript() 
     {
+        // question for rolf: when is this supposed to be used
+        
         for (int x = 0; x < Pieces.GetLength(0); x++)
         {
             for (int y = 0; y < Pieces.GetLength(1); y++)
             {
-                Pieces[x, y] = default(PieceData);
+                Pieces[x, y] = default;
             }
         }
     }
@@ -62,7 +79,7 @@ public class BoardScript : MonoBehaviour
         CleanBoard();
         foreach (var p in Pieces)
         {
-            p.BordColor = p.PermanentColor;
+            p.BoardColor = p.PermanentColor;
         }
     }
 
@@ -72,7 +89,7 @@ public class BoardScript : MonoBehaviour
         {
             for (int y = 0; y < Pieces.GetLength(1); y++)
             {
-                Pieces[x, y].BordColor = PlayerColor.None;
+                Pieces[x, y].BoardColor = PlayerColor.None;
                 Transform piece = Pieces[x, y].Piece;
                 
                 if (piece != null)
@@ -107,12 +124,14 @@ public class BoardScript : MonoBehaviour
         }
 
         // turn ends
-        Pieces[space.Coords.x, space.Coords.y].BordColor = PlayerTurn;
+        Pieces[space.Coords.x, space.Coords.y].BoardColor = PlayerTurn;
         IncrementTurn();
-        
-        if (CheckForEnd())
+
+        EndState endState = CheckForEnd();
+        if (endState != EndState.Continue)
         {
             _ending = true;
+            
             StartCoroutine(WinRoutine());
         }
     }
@@ -134,37 +153,46 @@ public class BoardScript : MonoBehaviour
 
 
     #region win/end check
-
-    enum EndState // refactor CheckForEnd to use this
+    enum EndState
     {
         Continue,
-        BlueWin,
-        RedWin,
+        Win,
         Draw
     }
-    private bool CheckForEnd()
+    private EndState CheckForEnd()
     {
-        int filled = 0;
-        // Debug.Log("! STARTED WIN CHECK");
-        // algorithm checks for every space, then for every space around it. if space is filled, then check opposite.
+        // algorithm checks for every space
+        int spacesFilled = 0;
         for (int x = 0; x < Pieces.GetLength(0); x++)
         {
             for (int y = 0; y < Pieces.GetLength(1); y++)
             {
-                
-                PlayerColor spaceColor = Pieces[x, y].BordColor;
+                PlayerColor spaceColor = Pieces[x, y].BoardColor;
                 if (spaceColor == PlayerColor.None) continue;
-                filled++;
-                
+             
+                spacesFilled++;
+
+                // check for win
                 if (CheckDirectionsFromSpace(new Vector2Int(x, y), spaceColor))
-                    return true;
+                    return EndState.Win;
             }
         }
-        return false;
+
+        // check for draw
+        int spaceCount = Pieces.GetLength(0) * Pieces.GetLength(1);
+        if (spacesFilled == spaceCount)
+            return EndState.Draw;
+        
+        // if nothing indicating game should end, it continues (and players can continue placing)
+        return EndState.Continue;
+
     }
+
+    #region win check
     private bool CheckDirectionsFromSpace(Vector2Int originCoords, PlayerColor color)
     {
-        // check 3x3 grid centered on space coords as a "direction"
+        // check for every space the origin space.
+        // Think of it as a 3x3 grid (with no middle), centered on origin coords, with each outer check as a "direction"
         for (int x = -1; x <= 1; x++)
         {
             for (int y = -1; y <= 1; y++)
@@ -187,15 +215,23 @@ public class BoardScript : MonoBehaviour
         }
         return false;
     }
+    /// <summary>
+    /// Returns true if target space and opposite space is the same color
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="opposite"></param>
+    /// <param name="originColor"></param>
+    /// <returns></returns>
     private bool CheckInDirection(Vector2Int target, Vector2Int opposite, PlayerColor originColor)
     {
-        PlayerColor targetColor = Pieces[target.x, target.y].BordColor;
-        PlayerColor oppositeColor = Pieces[opposite.x, opposite.y].BordColor;
-
+        PlayerColor targetColor = Pieces[target.x, target.y].BoardColor;
+        PlayerColor oppositeColor = Pieces[opposite.x, opposite.y].BoardColor;
+        
         if (targetColor != originColor) return false; // target space is not same originCoords space
         return targetColor == oppositeColor; // if target space is same as opposite space
     }
-    #endregion
+    #endregion // win
+    #endregion // end
 
     private bool IsValidSpace(Vector2Int coords)
     {

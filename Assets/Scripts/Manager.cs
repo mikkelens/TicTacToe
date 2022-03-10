@@ -1,12 +1,5 @@
 using UnityEngine;
 
-public enum PlayerColor
-{
-    None,
-    Blue,
-    Red
-}
-
 public class Manager : MonoBehaviour
 {
     public static Manager Main;

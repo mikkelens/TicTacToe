@@ -6,7 +6,7 @@ public class PieceData
 
     public PlayerColor PermanentColor;
 
-    public PlayerColor BordColor;
+    public PlayerColor BoardColor;
 
     public bool IsHigligthed = false;
 
