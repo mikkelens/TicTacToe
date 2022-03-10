@@ -43,7 +43,7 @@ public class BoardScript : MonoBehaviour
         {
             for (int y = 0; y < Pieces.GetLength(1); y++)
             {
-                Pieces[x, y] = new PieceData();
+                Pieces[x, y] = default(PieceData);
             }
         }
     }
