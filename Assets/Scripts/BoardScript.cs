@@ -44,11 +44,11 @@ public class BoardScript : MonoBehaviour
 
     private void Awake()
     {
-        InizializePieces();
+        InitializePieces();
         _manager = Manager.Main;
         _ending = false;
 
-        void InizializePieces()
+        void InitializePieces()
         {
             for (int x = 0; x < Pieces.GetLength(0); x++)
             {
