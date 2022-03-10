@@ -58,23 +58,31 @@ Shader "Custom/Outline"
             Cull front
 
             CGPROGRAM
-            #pragma vertex Vertex
+            #pragma vertex Vert
             #pragma fragment Frag
+
+            #include "UnityCG.cginc"
 
             float _OutlineRadius;
 
-            float4 Vertex(float4 position : POSITION, float3 normal : NORMAL)
+            UNITY_INSTANCING_BUFFER_START(Props)
+                UNITY_DEFINE_INSTANCED_PROP(fixed4, _Color)
+                UNITY_DEFINE_INSTANCED_PROP(fixed4, _OutlineColor)
+            UNITY_INSTANCING_BUFFER_END(Props)
+
+            float4 Vert(float4 position : POSITION, float3 normal : NORMAL) : SV_POSITION
             {
-                position.xyz += _OutlineRadius * normal
+                position.xyz += _OutlineRadius * normal;
 
                 return UnityObjectToClipPos(position);
             }
 
-            half4 Frag() : SV_TARGET
+            half4 Frag() : SV_Target
             {
                 return UNITY_ACCESS_INSTANCED_PROP(Props, _OutlineColor);
             }
-        };
-        ENDCG
+
+            ENDCG
+        }
     }
 }
