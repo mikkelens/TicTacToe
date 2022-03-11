@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 685ce5ed867e4b74ea5c589d869df74e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coords: {x: 0, y: 0}
+  placementOnBoard: {x: 0, y: 0}
 --- !u!33 &3769781962866185637
 MeshFilter:
   m_ObjectHideFlags: 0

@@ -6,7 +6,8 @@ public class Manager : MonoBehaviour
     public static Manager Main;
     
     [Header("Settings")]
-    [SerializeField] private BoardScript board;
+    [SerializeField]
+    public BoardScript board;
     [SerializeField] private Transform piecesParentParent;
     public Transform PiecesParent => piecesParentParent;
     
@@ -24,14 +25,7 @@ public class Manager : MonoBehaviour
 
     private void Start()
     {
-        RestartGame();
-    }
-
-    // potentially called by button?, but always called on scene load
-    private void RestartGame()
-    {
-        // Debug.Log("Started a new game.");
-        board.StartNewRound(); // start round with empty board
+        board.StartNewRound(); // start round (with empty board)
     }
 
     private void Update()
@@ -43,23 +37,30 @@ public class Manager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            // jank but eh lmao
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            ReloadGame();
         }
+    }
+
+    public void ReloadGame()
+    {
+        // jank but eh lmao
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void RaycastForSpaceOnMouse()
     {
-        // raycast on space, call spacescript.pressspace with board
-        const string layer = "Space";
-
-        int mask = LayerMask.GetMask(layer);
+        // raycast on spaceData, call spacescript.pressspace with board
+        int mask = LayerMask.GetMask("Space");
         if (Physics.Raycast(_cam.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, Mathf.Infinity, mask))
         {
-            SpaceScript space = hit.transform.GetComponent<SpaceScript>();
-            if (space != null)
+            SpaceScript spaceScript = hit.transform.GetComponent<SpaceScript>();
+            if (spaceScript != null)
             {
-                space.SpacePressed(board);
+                SpaceData spaceData = spaceScript.SpaceData;
+                if (spaceData.CurrentPieceData == null)
+                {
+                    board.PlaceShape(spaceData);
+                }
             }
         }
     }
