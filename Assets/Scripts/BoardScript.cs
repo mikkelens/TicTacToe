@@ -13,7 +13,9 @@ public class BoardScript : MonoBehaviour
     // [SerializeField] private float horizontalSpawnDistance = 4f;
     [SerializeField] private float verticalSpawnDistance = 6f;
     [SerializeField] private float verticalSpawnVelocity = -5f;
-    [SerializeField] private float waitAfterWinDetection = 1.5f;
+    [SerializeField] private float winWait = 1.5f;
+    [SerializeField] private float infiniteWinWait = 0.75f;
+    [SerializeField] private float infiniteWinSpawnVelocity = -5f;
     
     [SerializeField, Required] private PlayerShapeInfo bluePlayerShapeInfo;
     [SerializeField, Required] private PlayerShapeInfo redPlayerShapeInfo;
@@ -27,6 +29,7 @@ public class BoardScript : MonoBehaviour
     
     private bool _ending;
     private int _roundTurns;
+    private bool metaWinAchieved;
 
     private PlayerShapeInfo Current => _roundTurns % 2 == 0 ? B : R;
     private PlayerShapeInfo B => bluePlayerShapeInfo;
@@ -42,6 +45,7 @@ public class BoardScript : MonoBehaviour
     {
         CreateBoard();
         _manager = Manager.Main;
+        metaWinAchieved = false;
         _ending = false;
 
         void CreateBoard()
@@ -61,12 +65,20 @@ public class BoardScript : MonoBehaviour
         if (_ending) return;
 
         CleanBoard();
-        if (CheckInfiniteWin() != EndState.Continue)
+        (EndState winState, SpaceData spot) = CheckInfiniteWin();
+        if (winState != EndState.Continue)
         {
-            _ending = true;
-            MetaWin();
+            MetaWin(spot);
         }
         UpdateIcon();
+    }
+    
+    private void MetaWin(SpaceData winSpot)
+    {
+        // this will be repeatedly called bc autowin below
+       
+        PlaceShape(winSpot);
+        metaWinAchieved = true;
     }
 
 
@@ -74,7 +86,7 @@ public class BoardScript : MonoBehaviour
     /// Checks all permanent spaces if they have a situation where player has won infinitely
     /// </summary>
     /// <returns></returns>
-    private EndState CheckInfiniteWin()
+    private (EndState state, SpaceData winSpot) CheckInfiniteWin()
     {
         int spacesFilled = 0;
         
@@ -108,17 +120,14 @@ public class BoardScript : MonoBehaviour
                     if (oppositePieceData != null) continue;
                     // if there is space for a piece to be put
 
-                    // place it!
-                    PlaceShape(oppositeSpaceData);
-                    
-                    return EndState.Win; // detected that a player has "infinitely" won.
+                    return (EndState.Win, oppositeSpaceData); // detected that a player has "infinitely" won.
                 }
             }
         }
 
-        if (spacesFilled == TotalSpaceCount) return EndState.Draw;
+        if (spacesFilled == TotalSpaceCount) return (EndState.Draw, null);
         
-        return EndState.Continue;
+        return (EndState.Continue, null);
     }
 
     private (PieceData, Vector2Int)[] GetSurroundingAlikePieces(SpaceData originSpaceData, bool permanentOnly)
@@ -154,11 +163,6 @@ public class BoardScript : MonoBehaviour
         return surroundingPieces.ToArray();
     }
 
-    private void MetaWin()
-    {
-        // throw new System.NotImplementedException();
-    }
-    
     private void CleanBoard()
     {
         for (int x = 0; x < Spaces.GetLength(0); x++)
@@ -230,7 +234,8 @@ public class BoardScript : MonoBehaviour
         
         
         Rigidbody rb = pTransform.GetComponent<Rigidbody>();
-        rb.velocity = new Vector3(0f, verticalSpawnVelocity, 0f);
+        float spawnVelocity = metaWinAchieved ? infiniteWinSpawnVelocity : verticalSpawnVelocity;
+        rb.velocity = new Vector3(0f, spawnVelocity, 0f);
         newPieceData.Rb = rb;
 
         Material material = pTransform.GetComponent<MeshRenderer>().material;
@@ -345,7 +350,8 @@ public class BoardScript : MonoBehaviour
 
     private IEnumerator WinRoutine()
     {
-        yield return new WaitForSeconds(waitAfterWinDetection);
+        float waitTime = metaWinAchieved ? infiniteWinWait : winWait;
+        yield return new WaitForSeconds(waitTime);
         _ending = false;
         EndRound();
     }

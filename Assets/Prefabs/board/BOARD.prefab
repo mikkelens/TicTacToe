@@ -182,6 +182,7 @@ MonoBehaviour:
   verticalSpawnDistance: 20
   verticalSpawnVelocity: -30
   waitAfterWinDetection: 1.5
+  infiniteWinDelay: 0.8
   bluePlayerShapeInfo: {fileID: 11400000, guid: 705b32d5844cd554380a45cdb03e7142, type: 2}
   redPlayerShapeInfo: {fileID: 11400000, guid: f0391685c7c4fb94a94be25ed6efeb4d, type: 2}
   permanentMaterial: {fileID: 2100000, guid: 2adee37f4009aee48bcc51f2ff66643d, type: 2}
