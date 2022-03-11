@@ -2020,6 +2020,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8300000, guid: 700f5d42a3202044da686a6cd7898e8a, type: 3}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: metaWinWait
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: infiniteWinWait
       value: 0.7
       objectReference: {fileID: 0}
@@ -2031,6 +2035,10 @@ PrefabInstance:
       propertyPath: bluePlayerShapeInfo
       value: 
       objectReference: {fileID: 11400000, guid: b6c7a95be6efbcf4a9a266556a74098a, type: 2}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: metaWinSpawnVelocity
+      value: -45
+      objectReference: {fileID: 0}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: verticalSpawnVelocity
       value: -25

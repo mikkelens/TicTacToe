@@ -238,9 +238,15 @@ public class BoardScript : MonoBehaviour
         rb.velocity = new Vector3(0f, spawnVelocity, 0f);
         newPieceData.Rb = rb;
 
-        Material material = pTransform.GetComponent<MeshRenderer>().material;
-        material.color = Current.normalColor;
-        material.SetColor("_EmissionColor", Current.normalEmission);
+        MeshRenderer meshRenderer = pTransform.GetComponent<MeshRenderer>();
+        if (_metaWinAchieved)
+        {
+            SetMrPermanent(meshRenderer);
+        }
+        else
+        {
+            SetMrStandard(meshRenderer);
+        }
 
         return newPieceData;
     }
@@ -388,14 +394,20 @@ public class BoardScript : MonoBehaviour
 
         // make pieceData shine
         MeshRenderer meshRenderer = pieceTransform.GetComponent<MeshRenderer>();
-        SetMRMatProbs(meshRenderer);
+        SetMrPermanent(meshRenderer);
+    }
 
-        void SetMRMatProbs(MeshRenderer meshRenderer)
-        {
-            meshRenderer.material = permanentMaterial;
-            meshRenderer.material.SetColor("_Color", Current.permColor);
-            meshRenderer.material.SetColor("_OutlineColor", Current.permOutline);
-            meshRenderer.material.SetColor("_EmissionColor", Current.permEmission);
-        }
+    void SetMrPermanent(MeshRenderer meshRenderer)
+    {
+        meshRenderer.material = permanentMaterial;
+        meshRenderer.material.SetColor("_Color", Current.permColor);
+        meshRenderer.material.SetColor("_OutlineColor", Current.permOutline);
+        meshRenderer.material.SetColor("_EmissionColor", Current.permEmission);
+    }
+
+    void SetMrStandard(MeshRenderer meshRenderer)
+    {
+        meshRenderer.material.color = Current.normalColor;
+        meshRenderer.material.SetColor("_EmissionColor", Current.normalEmission);
     }
 }
