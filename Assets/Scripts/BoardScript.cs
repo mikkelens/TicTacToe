@@ -379,7 +379,7 @@ public class BoardScript : MonoBehaviour
         // make pieceData shine
         MeshRenderer meshRenderer = pieceTransform.GetComponent<MeshRenderer>();
         meshRenderer.material = permanentMaterial;
-        meshRenderer.material.color = Current.color;
-        meshRenderer.material.SetColor("_EmissionColor", Current.color);
+        meshRenderer.material.SetColor("_Color", Current.permColor);
+        meshRenderer.material.SetColor("_OutlineColor", Current.outline);
     }
 }
