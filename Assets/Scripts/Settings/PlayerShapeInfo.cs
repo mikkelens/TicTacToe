@@ -9,6 +9,7 @@ public class PlayerShapeInfo : ScriptableObject
     [Required] public Color color;
     [Required] public Color permColor;
     [Required] public Color outline;
+    [Required] public Color emission;
     [Required] public Sprite icon;
     [Required] public AudioClip landSfx;
     public SpaceData SpaceDataLastSpawnedOn { get; set; }
