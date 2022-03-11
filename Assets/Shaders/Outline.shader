@@ -7,6 +7,9 @@ Shader "Custom/Outline"
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
 
+        [HDR] 
+        _EmissionColor("EmissionColor", Color) = (0,0,0)
+
         _OutlineColor ("OutlineColor", Color) = (0,0,0,0)
         _OutlineRadius ("OutlineRadius", Range(0,2)) = 0.1
     }
@@ -33,6 +36,8 @@ Shader "Custom/Outline"
         half _Glossiness;
         half _Metallic;
 
+        float3 _EmissionColor;
+
         float _OutlineRadius;
 
 
@@ -46,6 +51,8 @@ Shader "Custom/Outline"
             // Albedo comes from a texture tinted by color
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
             o.Albedo = c.rgb;
+
+            o.Emission = c.rgb * _EmissionColor;
             // Metallic and smoothness come from slider variables
             o.Metallic = _Metallic;
             o.Smoothness = _Glossiness;

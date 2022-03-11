@@ -7,6 +7,7 @@ class PlayerShapeInfo : ScriptableObject
     public Color color;
     public Color permColor;
     public Color outline;
+    public Color emission;
     public Sprite icon;
     public PlayerType type;
     public SpaceData SpaceDataLastSpawnedOn { get; set; }

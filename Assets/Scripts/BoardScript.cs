@@ -381,5 +381,6 @@ public class BoardScript : MonoBehaviour
         meshRenderer.material = permanentMaterial;
         meshRenderer.material.SetColor("_Color", Current.permColor);
         meshRenderer.material.SetColor("_OutlineColor", Current.outline);
+        meshRenderer.material.SetColor("_EmissionColor", Current.emission);
     }
 }
