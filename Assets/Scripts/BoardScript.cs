@@ -170,9 +170,10 @@ public class BoardScript : MonoBehaviour
                 
                 if (pieceData.IsPermanent) continue;
                 // piece is not permanent
-                
+
                 Destroy(pieceData.PTransform.gameObject);
                 pieceData = null;
+                spaceData.Script.CanPlayAudio = true;
             }
         }
     }
@@ -189,9 +190,10 @@ public class BoardScript : MonoBehaviour
 
         // spawn pieceData
         PieceData placedPieceData = SpawnShapeOnSpace(playerShapeInfo.prefab, spaceData); // spawn it
+        placedPieceData.Info = Current;
         placedPieceData.Type = Current.type;
         spaceData.CurrentPieceData = placedPieceData;
-        
+
         playerShapeInfo.SpaceDataLastSpawnedOn = spaceData; // store last used spaceData
 
         // turn ends
@@ -230,6 +232,7 @@ public class BoardScript : MonoBehaviour
 
         Material material = pTransform.GetComponent<MeshRenderer>().material;
         material.color = Current.color;
+        material.SetColor("_EmissionColor", Current.color);
 
         return newPieceData;
     }

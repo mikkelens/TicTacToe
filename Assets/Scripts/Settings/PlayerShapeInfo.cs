@@ -1,14 +1,15 @@
-﻿using UnityEngine;
+﻿using Sirenix.OdinInspector;
+using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObjects/ShapeSettings", fileName = "ShapeSettings 1")]
-class PlayerShapeInfo : ScriptableObject
+public class PlayerShapeInfo : ScriptableObject
 {
-    public GameObject prefab;
-    public Color color;
-    public Color permColor;
-    public Color outline;
-    public Color emission;
-    public Sprite icon;
-    public PlayerType type;
+    [Required] public PlayerType type;
+    [Required] public GameObject prefab;
+    [Required] public Color color;
+    [Required] public Color permColor;
+    [Required] public Color outline;
+    [Required] public Sprite icon;
+    [Required] public AudioClip landSfx;
     public SpaceData SpaceDataLastSpawnedOn { get; set; }
 }
