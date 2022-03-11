@@ -170,9 +170,10 @@ public class BoardScript : MonoBehaviour
                 
                 if (pieceData.IsPermanent) continue;
                 // piece is not permanent
-                
+
                 Destroy(pieceData.PTransform.gameObject);
                 pieceData = null;
+                spaceData.Script.CanPlayAudio = true;
             }
         }
     }
