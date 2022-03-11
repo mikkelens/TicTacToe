@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a19221407ff0e8f4c867a357d57c52f5, type: 3}
   m_Name: Desaturated red
   m_EditorClassIdentifier: 
-  type: 1
-  prefab: {fileID: 4291668476404968708, guid: 63cbcc4ff1da5ed4194e19c28933cc70, type: 3}
-  normalColor: {r: 0.5418476, g: 0.5672094, b: 0.6886792, a: 1}
+  type: 0
+  prefab: {fileID: 8135961123477289631, guid: 4cd4cfa720aa0f6489e47f73f2e90219, type: 3}
+  normalColor: {r: 0.8584906, g: 0.5134745, b: 0.52625287, a: 1}
   normalEmission: {r: 0, g: 0, b: 0, a: 0}
-  permColor: {r: 0.2584905, g: 0.8415579, b: 1, a: 0}
-  permEmission: {r: 0.3207547, g: 0.3207547, b: 0.3207547, a: 0}
-  permOutline: {r: 0.1830188, g: 0.81783533, b: 1, a: 0}
-  icon: {fileID: 21300000, guid: 6a052734788dedc4085d5670226ffaca, type: 3}
-  landSfx: {fileID: 0}
+  permColor: {r: 1, g: 0.14528298, b: 0.14528298, a: 0}
+  permEmission: {r: 0.3490566, g: 0.3490566, b: 0.3490566, a: 0}
+  permOutline: {r: 1, g: 0.32452828, b: 0.32452828, a: 0}
+  icon: {fileID: 21300000, guid: 87ecce937f76d0b4b94f9062948b93db, type: 3}
+  landSfx: {fileID: 8300000, guid: 271aa6bafa4a06e4d88368ddf78753c9, type: 3}
