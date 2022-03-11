@@ -14,8 +14,8 @@ public class BoardScript : MonoBehaviour
     [SerializeField] private float verticalSpawnDistance = 6f;
     [SerializeField] private float verticalSpawnVelocity = -5f;
     [SerializeField] private float winWait = 1.5f;
-    [SerializeField] private float infiniteWinWait = 0.75f;
-    [SerializeField] private float infiniteWinSpawnVelocity = -5f;
+    [SerializeField] private float metaWinWait = 0.75f;
+    [SerializeField] private float metaWinSpawnVelocity = -5f;
     
     [SerializeField, Required] private PlayerShapeInfo bluePlayerShapeInfo;
     [SerializeField, Required] private PlayerShapeInfo redPlayerShapeInfo;
@@ -29,7 +29,7 @@ public class BoardScript : MonoBehaviour
     
     private bool _ending;
     private int _roundTurns;
-    private bool metaWinAchieved;
+    private bool _metaWinAchieved;
 
     private PlayerShapeInfo Current => _roundTurns % 2 == 0 ? B : R;
     private PlayerShapeInfo B => bluePlayerShapeInfo;
@@ -45,7 +45,7 @@ public class BoardScript : MonoBehaviour
     {
         CreateBoard();
         _manager = Manager.Main;
-        metaWinAchieved = false;
+        _metaWinAchieved = false;
         _ending = false;
 
         void CreateBoard()
@@ -78,7 +78,7 @@ public class BoardScript : MonoBehaviour
         // this will be repeatedly called bc autowin below
        
         PlaceShape(winSpot);
-        metaWinAchieved = true;
+        _metaWinAchieved = true;
     }
 
 
@@ -234,7 +234,7 @@ public class BoardScript : MonoBehaviour
         
         
         Rigidbody rb = pTransform.GetComponent<Rigidbody>();
-        float spawnVelocity = metaWinAchieved ? infiniteWinSpawnVelocity : verticalSpawnVelocity;
+        float spawnVelocity = _metaWinAchieved ? metaWinSpawnVelocity : verticalSpawnVelocity;
         rb.velocity = new Vector3(0f, spawnVelocity, 0f);
         newPieceData.Rb = rb;
 
@@ -350,7 +350,7 @@ public class BoardScript : MonoBehaviour
 
     private IEnumerator WinRoutine()
     {
-        float waitTime = metaWinAchieved ? infiniteWinWait : winWait;
+        float waitTime = _metaWinAchieved ? metaWinWait : winWait;
         yield return new WaitForSeconds(waitTime);
         _ending = false;
         EndRound();
