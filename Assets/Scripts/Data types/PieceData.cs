@@ -7,6 +7,7 @@
 public class PieceData
 {
     public Transform PTransform; // reference to the physical transform
+    public Rigidbody Rb;
     public PlayerColor ColorType; // color (blue or red)
     public bool IsPermanent; // whether it is a permanent pieceData or not.
 }

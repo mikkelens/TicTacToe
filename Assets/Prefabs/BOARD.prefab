@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 8583585537138921033}
   - component: {fileID: 7845376182176535336}
   m_Layer: 0
-  m_Name: board
+  m_Name: BOARD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -180,7 +180,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   verticalSpawnDistance: 20
-  waitAfterWin: 3
+  verticalSpawnVelocity: -5
+  waitAfterWinDetection: 1.5
   bluePlayerShapeInfo: {fileID: 11400000, guid: 705b32d5844cd554380a45cdb03e7142, type: 2}
   redPlayerShapeInfo: {fileID: 11400000, guid: f0391685c7c4fb94a94be25ed6efeb4d, type: 2}
   permanentMaterial: {fileID: 2100000, guid: 2adee37f4009aee48bcc51f2ff66643d, type: 2}
@@ -254,6 +255,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
       propertyPath: placement.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.y
       value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -338,6 +343,14 @@ PrefabInstance:
       propertyPath: placement.y
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.y
+      value: -1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
 --- !u!4 &2171291258947362445 stripped
@@ -416,6 +429,10 @@ PrefabInstance:
       propertyPath: placement.y
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.y
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
 --- !u!4 &1848039843381982085 stripped
@@ -490,6 +507,10 @@ PrefabInstance:
       propertyPath: placement.x
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.x
+      value: -1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
 --- !u!4 &9181853495095737764 stripped
@@ -562,6 +583,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
       propertyPath: placement.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.x
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -644,6 +669,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
       propertyPath: placement.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.y
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -798,6 +831,14 @@ PrefabInstance:
       propertyPath: placement.y
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.y
+      value: -1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
 --- !u!4 &5787691625390275413 stripped
@@ -878,6 +919,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
       propertyPath: placement.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7623155616579796931, guid: 08783f57555d0a64e9c4831a65a26f17, type: 3}
+      propertyPath: placementOnBoard.y
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

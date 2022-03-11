@@ -11,7 +11,8 @@ public class BoardScript : MonoBehaviour
     [Header("Settings")] // assigned in prefab
     // [SerializeField] private float horizontalSpawnDistance = 4f;
     [SerializeField] private float verticalSpawnDistance = 6f;
-    [SerializeField] private float waitAfterWin = 3f;
+    [SerializeField] private float verticalSpawnVelocity = -5f;
+    [SerializeField] private float waitAfterWinDetection = 1.5f;
     
     [SerializeField] private PlayerShapeInfo bluePlayerShapeInfo;
     [SerializeField] private PlayerShapeInfo redPlayerShapeInfo;
@@ -29,12 +30,12 @@ public class BoardScript : MonoBehaviour
     private bool _ending;
     private int _roundTurns;
     
-    private PlayerColor PlayerTurn => _roundTurns % 2 == 1 ? PlayerColor.Blue : PlayerColor.Red;
+    private PlayerColor PlayerTurn => _roundTurns % 2 == 0 ? PlayerColor.Blue : PlayerColor.Red;
     private PlayerShapeInfo CurrentPlayer => _roundTurns % 2 == 1 ? B : R;
 
     
     private Manager _manager;
-    
+
     private BoardScript() { }
 
     private void Awake()
@@ -59,13 +60,14 @@ public class BoardScript : MonoBehaviour
     {
         if (_ending) return;
 
+        CleanBoard();
+        
         if (CheckInfiniteWin() != EndState.Continue)
         {
+            Debug.Log("Infinite win detected.");
+            _ending = true;
             MetaWin();
-            return;
         }
-        IncrementTurn(); // <- only because game always ends on loser's turn, we increment to make it the winner's turn
-        CleanBoard();
     }
 
 
@@ -91,21 +93,18 @@ public class BoardScript : MonoBehaviour
                 
                 if (PlayerTurn != pieceData.ColorType) continue;
                 // if player can place immediately
-                
-                // check for anything next to it
-                (SpaceData, Vector2Int)[] surroundingPermanents = GetSurroundingAlikePieces(spaceData, true);
-                if (surroundingPermanents == null) continue;
-                
+
                 // check if surrounding pieces have spaceData and that spaceData is same color type
-                foreach ((SpaceData data, Vector2Int offset) nextPermanent in surroundingPermanents)
+                foreach ((SpaceData, Vector2Int offset) nextPermanent in GetSurroundingAlikePieces(spaceData, true))
                 {
                     // try to access the opposite spaceData of the one under nextPermanent
                     Vector2Int oppositePos = spaceData.Coords - nextPermanent.offset;
                     if (!IsValidSpace(oppositePos)) continue;
-                    // if spaceData exists
+                    // if space exists
 
                     PieceData oppositePieceData = Spaces[oppositePos.x, oppositePos.y].CurrentPieceData;
-                    if (oppositePieceData == null) continue;
+                    if (oppositePieceData != null) continue;
+                    // if there is space for a piece to be put
 
                     return EndState.Win; // detected that a player has "infinitely" won.
                 }
@@ -216,12 +215,16 @@ public class BoardScript : MonoBehaviour
         Vector2Int coords = spaceData.Coords;
         Spaces[coords.x, coords.y].CurrentPieceData = newPieceData;
 
+        Vector3 spawnOffset = Vector3.up * verticalSpawnDistance;
         Transform pTransform = Instantiate(prefab).transform; // spawn, get transform
         pTransform.parent = _manager.PiecesParent; // set in a parent (for editor convenience)
-        Vector3 spawnOffset = Vector3.up * verticalSpawnDistance;
         pTransform.position = spaceData.PhysicalSpaceTransform.position + spawnOffset; // set up in the air
-
         newPieceData.PTransform = pTransform;
+        
+        
+        Rigidbody rb = pTransform.GetComponent<Rigidbody>();
+        rb.velocity = new Vector3(0f, verticalSpawnVelocity, 0f);
+        newPieceData.Rb = rb;
 
         Material material = pTransform.GetComponent<MeshRenderer>().material;
         material.color = CurrentPlayer.color;
@@ -276,15 +279,22 @@ public class BoardScript : MonoBehaviour
                 if (x == 0 && y == 0) continue; // no direction is not a direction
 
                 Vector2Int offset = new Vector2Int(x, y);
-                Vector2Int targetCoords = origin.Coords + offset;
-                Vector2Int oppositeCoords = origin.Coords - offset;
+                Vector2Int target = origin.Coords + offset;
+                Vector2Int opposite = origin.Coords - offset;
                 
                 // Debug.Log($"Origin: {originCoords}, Target: {targetCoords}, Opposite: {oppositeCoords}");
                 
-                if (!IsValidSpace(targetCoords)) continue;
-                if (!IsValidSpace(oppositeCoords)) continue;
-                
-                if (CheckPiecesInLine(targetCoords, oppositeCoords, origin.CurrentPieceData.ColorType))
+                if (!IsValidSpace(target)) continue;
+                if (!IsValidSpace(opposite)) continue;
+                // a line of spaces exist
+
+                // we already know spaces exist at coordinates so get them without extra checks
+                PieceData targetPiece = Spaces[target.x, target.y].CurrentPieceData;
+                PieceData oppositePiece = Spaces[opposite.x, opposite.y].CurrentPieceData;
+                if (targetPiece == null || oppositePiece == null) continue;
+                // if both target and opposite piece exist
+
+                if (CheckPieceSimilarity(targetPiece, oppositePiece, origin.CurrentPieceData.ColorType))
                     return true;
             }
         }
@@ -297,10 +307,10 @@ public class BoardScript : MonoBehaviour
     /// <param name="opposite"></param>
     /// <param name="originColor"></param>
     /// <returns></returns>
-    private bool CheckPiecesInLine(Vector2Int target, Vector2Int opposite, PlayerColor originColor)
+    private bool CheckPieceSimilarity(PieceData target, PieceData opposite, PlayerColor originColor)
     {
-        PlayerColor targetColor = Spaces[target.x, target.y].CurrentPieceData.ColorType;
-        PlayerColor oppositeColor = Spaces[opposite.x, opposite.y].CurrentPieceData.ColorType;
+        PlayerColor targetColor = target.ColorType;
+        PlayerColor oppositeColor = opposite.ColorType;
         
         if (targetColor != originColor) return false; // target spaceData is not same originCoords spaceData
         return targetColor == oppositeColor; // if target spaceData is same as opposite spaceData
@@ -324,7 +334,7 @@ public class BoardScript : MonoBehaviour
     
     private IEnumerator WinRoutine()
     {
-        yield return new WaitForSeconds(waitAfterWin);
+        yield return new WaitForSeconds(waitAfterWinDetection);
         _ending = false;
         EndRound();
     }
@@ -338,6 +348,7 @@ public class BoardScript : MonoBehaviour
         
         PieceData lastPieceData = CurrentPlayer.SpaceDataLastSpawnedOn.CurrentPieceData;
         MakePiecePermanent(lastPieceData);
+        IncrementTurn();
         StartNewRound();
     }
 
