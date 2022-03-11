@@ -10,12 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a19221407ff0e8f4c867a357d57c52f5, type: 3}
-  m_Name: Colorful blue player
+  m_Name: Colorful blue
   m_EditorClassIdentifier: 
   type: 0
   prefab: {fileID: 8135961123477289631, guid: 4cd4cfa720aa0f6489e47f73f2e90219, type: 3}
-  color: {r: 0, g: 0.42241383, b: 1, a: 1}
-  permColor: {r: 0, g: 0.8008744, b: 0.9811321, a: 1}
-  outline: {r: 0, g: 0.27641797, b: 0.3962264, a: 1}
+  normalColor: {r: 0, g: 0.38110334, b: 0.8207547, a: 0}
+  normalEmission: {r: 0, g: 0.14042504, b: 0.3301887, a: 0}
+  permColor: {r: 0, g: 0.6043229, b: 1, a: 1}
+  permEmission: {r: 0, g: 0.6043229, b: 1, a: 1}
+  permOutline: {r: 0, g: 0.6043229, b: 1, a: 1}
   icon: {fileID: 21300000, guid: db35eb23b2cbabb4d9701a82478ab04c, type: 3}
   landSfx: {fileID: 8300000, guid: 271aa6bafa4a06e4d88368ddf78753c9, type: 3}

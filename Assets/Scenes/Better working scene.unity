@@ -1843,6 +1843,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BOARD
       objectReference: {fileID: 0}
+    - target: {fileID: 4895616846526764333, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: dba45e186d3a7bc408b05855e735feef, type: 2}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: shapeIcon
       value: 
@@ -1850,11 +1854,11 @@ PrefabInstance:
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: redPlayerShapeInfo
       value: 
-      objectReference: {fileID: 11400000, guid: 7b5ca53ec872b0b4ba9e1842a2b28d3d, type: 2}
+      objectReference: {fileID: 11400000, guid: f4cfe30c5c83b7249b1d30d93f351877, type: 2}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: bluePlayerShapeInfo
       value: 
-      objectReference: {fileID: 11400000, guid: b6c7a95be6efbcf4a9a266556a74098a, type: 2}
+      objectReference: {fileID: 11400000, guid: 31e48246243da434595dbced83d85e63, type: 2}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: verticalSpawnVelocity
       value: -30

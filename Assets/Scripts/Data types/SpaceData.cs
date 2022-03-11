@@ -7,8 +7,8 @@
 /// </summary>
 public class SpaceData
 {
-    public Transform PhysicalSpaceTransform;
     public SpaceScript Script;
+    public Transform PhysicalSpaceTransform;
     public Vector2Int Coords; // position of the spaceData on the grid
     public PieceData CurrentPieceData; // if not null, references a physical pieceData
     public SpaceData() { }

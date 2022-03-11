@@ -231,8 +231,8 @@ public class BoardScript : MonoBehaviour
         newPieceData.Rb = rb;
 
         Material material = pTransform.GetComponent<MeshRenderer>().material;
-        material.color = Current.color;
-        material.SetColor("_EmissionColor", Current.color);
+        material.color = Current.normalColor;
+        material.SetColor("_EmissionColor", Current.normalEmission);
 
         return newPieceData;
     }
@@ -384,7 +384,7 @@ public class BoardScript : MonoBehaviour
 
         meshRenderer.material = permanentMaterial;
         meshRenderer.material.SetColor("_Color", Current.permColor);
-        meshRenderer.material.SetColor("_OutlineColor", Current.outline);
-        meshRenderer.material.SetColor("_EmissionColor", Current.emission);
+        meshRenderer.material.SetColor("_OutlineColor", Current.permOutline);
+        meshRenderer.material.SetColor("_EmissionColor", Current.permEmission);
     }
 }
