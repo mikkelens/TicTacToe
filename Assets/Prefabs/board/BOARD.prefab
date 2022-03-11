@@ -180,12 +180,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   verticalSpawnDistance: 20
-  verticalSpawnVelocity: -5
+  verticalSpawnVelocity: -30
   waitAfterWinDetection: 1.5
   bluePlayerShapeInfo: {fileID: 11400000, guid: 705b32d5844cd554380a45cdb03e7142, type: 2}
   redPlayerShapeInfo: {fileID: 11400000, guid: f0391685c7c4fb94a94be25ed6efeb4d, type: 2}
   permanentMaterial: {fileID: 2100000, guid: 2adee37f4009aee48bcc51f2ff66643d, type: 2}
   shapeIcon: {fileID: 0}
+  winLandSfx: {fileID: 8300000, guid: dd903340cac3cd2439e2d7b1fc19341b, type: 3}
+  drawLandSfx: {fileID: 8300000, guid: f04ae6f857342cd40a36e87fcb6081b6, type: 3}
 --- !u!1001 &2291246449052163694
 PrefabInstance:
   m_ObjectHideFlags: 0

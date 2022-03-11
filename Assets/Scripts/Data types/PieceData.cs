@@ -11,4 +11,10 @@ public class PieceData
     public bool IsPermanent; // whether it is a permanent pieceData or not.
     public PlayerType Type; // color (blue or red)
     public PlayerShapeInfo Info;
+    private AudioClip _landSfx;
+    public AudioClip LandSfx
+    {
+        get => _landSfx != null ? _landSfx : Info.landSfx;
+        set => _landSfx = value;
+    }
 }

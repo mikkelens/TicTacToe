@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,12 +15,15 @@ public class BoardScript : MonoBehaviour
     [SerializeField] private float verticalSpawnVelocity = -5f;
     [SerializeField] private float waitAfterWinDetection = 1.5f;
     
-    [SerializeField] private PlayerShapeInfo bluePlayerShapeInfo;
-    [SerializeField] private PlayerShapeInfo redPlayerShapeInfo;
+    [SerializeField, Required] private PlayerShapeInfo bluePlayerShapeInfo;
+    [SerializeField, Required] private PlayerShapeInfo redPlayerShapeInfo;
 
     [SerializeField] private Material permanentMaterial;
     
     [SerializeField] private Image shapeIcon;
+    
+    [SerializeField] private AudioClip winLandSfx;
+    [SerializeField] private AudioClip drawLandSfx;
     
     private bool _ending;
     private int _roundTurns;
@@ -59,7 +63,6 @@ public class BoardScript : MonoBehaviour
         CleanBoard();
         if (CheckInfiniteWin() != EndState.Continue)
         {
-            Debug.Log("Infinite win detected.");
             _ending = true;
             MetaWin();
         }
@@ -201,8 +204,8 @@ public class BoardScript : MonoBehaviour
         EndState endState = CheckForWin();
         if (endState != EndState.Continue)
         {
+            placedPieceData.LandSfx = endState == EndState.Win ? winLandSfx : drawLandSfx;
             _ending = true;
-            
             StartCoroutine(WinRoutine());
         }
     }
@@ -286,8 +289,6 @@ public class BoardScript : MonoBehaviour
                 Vector2Int offset = new Vector2Int(x, y);
                 Vector2Int target = origin.Coords + offset;
                 Vector2Int opposite = origin.Coords - offset;
-                
-                // Debug.Log($"Origin: {originCoords}, Target: {targetCoords}, Opposite: {oppositeCoords}");
                 
                 if (!IsValidSpace(target)) continue;
                 if (!IsValidSpace(opposite)) continue;

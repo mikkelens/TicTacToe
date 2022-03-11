@@ -63,7 +63,6 @@ public class SpaceScript : MonoBehaviour
         
         if (col.gameObject.layer != layer) return;
         
-        Debug.Log("Shape hit space.");
         PlaySfx();
         CanPlayAudio = false;
     }
@@ -75,7 +74,7 @@ public class SpaceScript : MonoBehaviour
         // if piece exists
         
         // set piece audio clip
-        _audio.clip = currentPiece.Info.landSfx;
+        _audio.clip = currentPiece.LandSfx;
         _audio.Play();
     }
 }
