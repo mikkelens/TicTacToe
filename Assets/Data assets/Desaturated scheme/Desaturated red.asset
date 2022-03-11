@@ -20,4 +20,4 @@ MonoBehaviour:
   permEmission: {r: 0.3207547, g: 0.3207547, b: 0.3207547, a: 0}
   permOutline: {r: 0.1830188, g: 0.81783533, b: 1, a: 0}
   icon: {fileID: 21300000, guid: 6a052734788dedc4085d5670226ffaca, type: 3}
-  landSfx: {fileID: 0}
+  landSfx: {fileID: 8300000, guid: 271aa6bafa4a06e4d88368ddf78753c9, type: 3}
