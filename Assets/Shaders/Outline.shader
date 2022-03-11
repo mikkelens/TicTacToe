@@ -8,7 +8,7 @@ Shader "Custom/Outline"
         _Metallic ("Metallic", Range(0,1)) = 0.0
 
         _OutlineColor ("OutlineColor", Color) = (0,0,0,0)
-        _OutlineRadius ("OutlineRadius", Range(0,1)) = 0.1
+        _OutlineRadius ("OutlineRadius", Range(0,2)) = 0.1
     }
     SubShader
     {
@@ -72,9 +72,10 @@ Shader "Custom/Outline"
 
             float4 Vert(float4 position : POSITION, float3 normal : NORMAL) : SV_POSITION
             {
-                position.xyz += _OutlineRadius * normal;
+                /*position.xyz += _OutlineRadius * normal;
 
-                return UnityObjectToClipPos(position);
+                return UnityObjectToClipPos(position);*/
+                return UnityObjectToClipPos(position * _OutlineRadius); //Works best with convex shapes
             }
 
             half4 Frag() : SV_Target
