@@ -373,14 +373,20 @@ public class BoardScript : MonoBehaviour
     private void MakePiecePermanent(PieceData pieceData)
     {
         Transform pieceTransform = pieceData.PTransform;
-        
+
         pieceData.IsPermanent = true;
-        
+
         // make pieceData shine
         MeshRenderer meshRenderer = pieceTransform.GetComponent<MeshRenderer>();
-        meshRenderer.material = permanentMaterial;
-        meshRenderer.material.SetColor("_Color", Current.permColor);
-        meshRenderer.material.SetColor("_OutlineColor", Current.outline);
-        meshRenderer.material.SetColor("_EmissionColor", Current.emission);
+        meshRenderer.material = SetMatProbs();
+
+        Material SetMatProbs()
+        {
+            Material Mat = permanentMaterial;
+            Mat.SetColor("_Color", Current.permColor);
+            Mat.SetColor("_OutlineColor", Current.outline);
+            Mat.SetColor("_EmissionColor", Current.emission);
+            return Mat;
+        }
     }
 }
