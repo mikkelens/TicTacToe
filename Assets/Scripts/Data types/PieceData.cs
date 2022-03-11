@@ -10,4 +10,5 @@ public class PieceData
     public Rigidbody Rb;
     public bool IsPermanent; // whether it is a permanent pieceData or not.
     public PlayerType Type; // color (blue or red)
+    public PlayerShapeInfo Info;
 }

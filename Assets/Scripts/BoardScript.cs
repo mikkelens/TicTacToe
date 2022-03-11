@@ -190,9 +190,10 @@ public class BoardScript : MonoBehaviour
 
         // spawn pieceData
         PieceData placedPieceData = SpawnShapeOnSpace(playerShapeInfo.prefab, spaceData); // spawn it
+        placedPieceData.Info = Current;
         placedPieceData.Type = Current.type;
         spaceData.CurrentPieceData = placedPieceData;
-        
+
         playerShapeInfo.SpaceDataLastSpawnedOn = spaceData; // store last used spaceData
 
         // turn ends
@@ -231,6 +232,7 @@ public class BoardScript : MonoBehaviour
 
         Material material = pTransform.GetComponent<MeshRenderer>().material;
         material.color = Current.color;
+        material.SetColor("_EmissionColor", Current.color);
 
         return newPieceData;
     }
@@ -380,7 +382,7 @@ public class BoardScript : MonoBehaviour
         // make pieceData shine
         MeshRenderer meshRenderer = pieceTransform.GetComponent<MeshRenderer>();
         meshRenderer.material = permanentMaterial;
-        meshRenderer.material.color = Current.color;
-        meshRenderer.material.SetColor("_EmissionColor", Current.color);
+        meshRenderer.material.SetColor("_Color", Current.permColor);
+        meshRenderer.material.SetColor("_OutlineColor", Current.outline);
     }
 }

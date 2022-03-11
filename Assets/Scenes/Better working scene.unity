@@ -1843,14 +1843,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: BOARD
       objectReference: {fileID: 0}
-    - target: {fileID: 5552388208226576580, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
-      propertyPath: m_Size.y
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: shapeIcon
       value: 
       objectReference: {fileID: 957492672}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: redPlayerShapeInfo
+      value: 
+      objectReference: {fileID: 11400000, guid: 7b5ca53ec872b0b4ba9e1842a2b28d3d, type: 2}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: bluePlayerShapeInfo
+      value: 
+      objectReference: {fileID: 11400000, guid: b6c7a95be6efbcf4a9a266556a74098a, type: 2}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: verticalSpawnVelocity
       value: -30

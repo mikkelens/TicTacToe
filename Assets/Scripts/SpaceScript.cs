@@ -64,7 +64,18 @@ public class SpaceScript : MonoBehaviour
         if (col.gameObject.layer != layer) return;
         
         Debug.Log("Shape hit space.");
-        _audio.Play();
+        PlaySfx();
         CanPlayAudio = false;
+    }
+
+    private void PlaySfx()
+    {
+        PieceData currentPiece = SpaceData.CurrentPieceData;
+        if (currentPiece == null) return;
+        // if piece exists
+        
+        // set piece audio clip
+        _audio.clip = currentPiece.Info.landSfx;
+        _audio.Play();
     }
 }
