@@ -48,8 +48,8 @@ public partial class BoardScript : MonoBehaviour
         _lenghts = new Vector2Int(Spaces.GetLength(0), Spaces.GetLength(1));
         LineConstructor.Spaces = Spaces;
         LineConstructor.Lenghts = _lenghts;
-        SpaceChecker.Spaces = Spaces;
-        SpaceChecker.Lenghts = _lenghts;
+        SpaceChecks.Spaces = Spaces;
+        SpaceChecks.Lenghts = _lenghts;
         CreateBoard();
         _manager = Manager.Main;
         _metaWinAchieved = false;
@@ -72,7 +72,7 @@ public partial class BoardScript : MonoBehaviour
         if (_ending) return;
 
         CleanBoard();
-        (EndState winState, SpaceData spot) = SpaceChecker.InfiniteWin(Current);
+        (EndState winState, SpaceData spot) = SpaceChecks.InfiniteWin(Current);
         if (winState != EndState.Continue)
         {
             MetaWin(spot);
@@ -130,7 +130,7 @@ public partial class BoardScript : MonoBehaviour
 
         // turn ends
         IncrementTurn();
-        EndState endState = SpaceChecker.CheckForWin();
+        EndState endState = SpaceChecks.CheckForWin();
         if (endState != EndState.Continue)
         {
             placedPieceData.LandSfx = endState == EndState.Win ? winLandSfx : drawLandSfx;
