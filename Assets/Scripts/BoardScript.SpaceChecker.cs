@@ -28,6 +28,26 @@ public partial class BoardScript
             return true;
         }
 
+        public static EndState UniversalWinCheck(bool metaWin = false)
+        {
+            SpaceData[][] allLines = LineConstructor.GetAllLines();
+            int blues = 0;
+            int reds = 0;
+            foreach (SpaceData[] line in allLines)
+            foreach (var space in line)
+            {
+                PieceData piece = space.CurrentPieceData;
+                if (piece == null) continue;
+
+                if (piece.Type == PlayerType.Blue) blues++;
+                else if (piece.Type == PlayerType.Red) reds++;
+            }
+            if (blues >= LineConstructor.Lenghts.x || reds >= LineConstructor.Lenghts.x)
+                return EndState.Win;
+
+            return EndState.Continue;
+        }
+
         /// <summary>
         /// Checks if game ends.
         /// </summary>
