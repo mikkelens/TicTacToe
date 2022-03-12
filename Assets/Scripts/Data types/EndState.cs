@@ -2,5 +2,7 @@
 {
     Continue,
     Win,
-    Draw
+    Draw,
+    InfiniteWin,
+    InfiniteDraw
 }

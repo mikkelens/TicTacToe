@@ -49,7 +49,7 @@ public class SpaceScript : MonoBehaviour
     {
         _audio = GetComponent<AudioSource>();
         CanPlayAudio = true;
-        SpaceData = Manager.Main.board.Spaces[Coords.x, Coords.y];
+        SpaceData = BoardScript.Spaces[Coords.x, Coords.y];
         SpaceData.Script = this;
         SpaceData.PhysicalSpaceTransform = transform;
         SpaceData.Coords = Coords;

@@ -5,6 +5,7 @@ public partial class BoardScript
 {
     private static class SpaceChecks
     {
+        public static PlayerShapeInfo CurrentPlayer { get; set; }
         public static SpaceData[,] Spaces
         {
             get => _spaces;
@@ -28,73 +29,76 @@ public partial class BoardScript
             return true;
         }
 
-        public static EndState UniversalWinCheck(bool metaWin = false)
+        /// <summary>
+        /// Should be called at the end of every turn or placement. Will figure out what should happen.
+        /// </summary>
+        /// <returns></returns>
+        public static EndState UniversalWinCheck()
         {
+            bool noGaps = true;
             SpaceData[][] allLines = LineConstructor.GetAllLines();
             int[] allColorInstances = new int[2];
             foreach (SpaceData[] line in allLines)
-            foreach (var space in line)
             {
-                PieceData piece = space.CurrentPieceData;
-                if (piece == null) continue;
+                int redsInLine = 0;
+                int bluesInLine = 0;
+                foreach (SpaceData space in line)
+                {
+                    PieceData piece = space.CurrentPieceData;
+                    if (piece == null) continue;
 
-                if (piece.Type == PlayerType.Blue) blues++;
-                else if (piece.Type == PlayerType.Red) reds++;
-            }
+                    if (piece.Type == PlayerType.Blue) bluesInLine++;
+                    else if (piece.Type == PlayerType.Red) redsInLine++;
+                }
+                if (redsInLine >= 3 || bluesInLine >= 3) return EndState.Win;
 
-            if (metaWin)
-            {
-                foreach (int instancesOfColor in allColorInstances)
+                if (redsInLine + bluesInLine >= 3) continue; // continue search if line is blocked
+                
+                // if there is a gap
+                noGaps = false;
+                int currentPlayerLineCount = CurrentPlayer.type == PlayerType.Blue ? bluesInLine : redsInLine;
+
+                if (redsInLine == 2 || bluesInLine == 2)
                 {
                     
                 }
-                if (blues >= _lenghts.x - 1 || reds >= _lenghts.x)
-                    return EndState.Win;
             }
-            else
-            {
-                int color;
-                if (blues >= _lenghts.x || reds >= _lenghts.x)
-                    return EndState.Win;
-            }
-            
-            
 
-            return EndState.Continue;
+            return noGaps ? EndState.Draw : EndState.Continue;
         }
 
         /// <summary>
         /// Checks if game ends.
         /// </summary>
         /// <returns>The end state that should be used.</returns>
-        // public static EndState CheckForWin()
-        // {
-        //     // algorithm checks for every spaceData
-        //     int spacesFilled = 0;
-        //     for (int x = 0; x < Lenghts.x; x++)
-        //     for (int y = 0; y < Lenghts.y; y++)
-        //     {
-        //         SpaceData spaceData = Spaces[x, y];
-        //         PieceData pieceData = spaceData.CurrentPieceData;
-        //         if (pieceData == null) continue;
-        //
-        //         // if pieceData exists
-        //
-        //         spacesFilled++;
-        //
-        //         // check for win
-        //         if (CheckDirectionsFromSpace(spaceData))
-        //             return EndState.Win;
-        //     }
-        //
-        //     // check for draw
-        //     if (spacesFilled == TotalSpaceCount)
-        //         return EndState.Draw;
-        //
-        //     // if nothing indicating game should end, it continues (and players can continue placing)
-        //     return EndState.Continue;
-        //
-        // }
+        public static EndState CheckForWin()
+        {
+            // algorithm checks for every spaceData
+            int spacesFilled = 0;
+            for (int x = 0; x < Lenghts.x; x++)
+            for (int y = 0; y < Lenghts.y; y++)
+            {
+                SpaceData spaceData = Spaces[x, y];
+                PieceData pieceData = spaceData.CurrentPieceData;
+                if (pieceData == null) continue;
+        
+                // if pieceData exists
+        
+                spacesFilled++;
+        
+                // check for win
+                if (CheckDirectionsFromSpace(spaceData))
+                    return EndState.Win;
+            }
+        
+            // check for draw
+            if (spacesFilled == TotalSpaceCount)
+                return EndState.Draw;
+        
+            // if nothing indicating game should end, it continues (and players can continue placing)
+            return EndState.Continue;
+        
+        }
 
         private static bool CheckDirectionsFromSpace(SpaceData origin)
         {

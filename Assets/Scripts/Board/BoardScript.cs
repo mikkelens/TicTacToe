@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public partial class BoardScript : MonoBehaviour
 {
     private Manager _manager;
-    
+
     [Header("Settings")] // assigned in prefab
     // [SerializeField] private float horizontalSpawnDistance = 4f;
     [SerializeField] private float verticalSpawnDistance = 6f;
@@ -17,19 +17,19 @@ public partial class BoardScript : MonoBehaviour
     [SerializeField] private float winWait = 1.5f;
     [SerializeField] private float metaWinWait = 0.75f;
     [SerializeField] private float metaWinSpawnVelocity = -5f;
-    
+
     [SerializeField, Required] private PlayerShapeInfo bluePlayerShapeInfo;
     [SerializeField, Required] private PlayerShapeInfo redPlayerShapeInfo;
 
     [SerializeField] private Material permanentMaterial;
-    
+
     [SerializeField] private Image shapeIcon;
-    
+
     [SerializeField] private AudioClip winLandSfx;
     [SerializeField] private AudioClip drawLandSfx;
-    
-    private bool _ending;
-    private int _roundTurns;
+
+    private static bool _ending;
+    private static int _roundTurns;
     private bool _metaWinAchieved;
 
     private PlayerShapeInfo Current => _roundTurns % 2 == 0 ? B : R;
@@ -37,10 +37,10 @@ public partial class BoardScript : MonoBehaviour
     private PlayerShapeInfo R => redPlayerShapeInfo;
 
     // board can only be 3x3 grid without breaking
-    public readonly SpaceData[,] Spaces = new SpaceData[3, 3];
+    public static readonly SpaceData[,] Spaces = new SpaceData[3, 3];
     private Vector2Int _lenghts;
     private Vector2Int Lenghts => _lenghts;
-    
+
     private BoardScript() { }
 
     private void Awake()
@@ -48,6 +48,7 @@ public partial class BoardScript : MonoBehaviour
         _lenghts = new Vector2Int(Spaces.GetLength(0), Spaces.GetLength(1));
         LineConstructor.Spaces = Spaces;
         LineConstructor.Lenghts = _lenghts;
+        SpaceChecks.CurrentPlayer = Current;
         SpaceChecks.Spaces = Spaces;
         SpaceChecks.Lenghts = _lenghts;
         CreateBoard();
@@ -66,24 +67,21 @@ public partial class BoardScript : MonoBehaviour
             }
         }
     }
-    
+
+    /// <summary>
+    /// Call this to start a new round.
+    /// </summary>
     public void StartNewRound()
     {
         if (_ending) return;
 
         CleanBoard();
-        (EndState winState, SpaceData spot) = SpaceChecks.InfiniteWin(Current);
-        if (winState != EndState.Continue)
-        {
-            MetaWin(spot);
-        }
-        UpdateIcon();
     }
-    
+
     private void MetaWin(SpaceData winSpot)
     {
         // this will be repeatedly called bc autowin below
-       
+
         PlaceShape(winSpot);
         _metaWinAchieved = true;
     }
@@ -98,9 +96,11 @@ public partial class BoardScript : MonoBehaviour
                 ref PieceData pieceData = ref spaceData.CurrentPieceData;
 
                 if (pieceData == null) continue;
+
                 // piece exists
-                
+
                 if (pieceData.IsPermanent) continue;
+
                 // piece is not permanent
 
                 Destroy(pieceData.PTransform.gameObject);
@@ -110,80 +110,13 @@ public partial class BoardScript : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called by a spaceData that got pressed. Calling this switches turn.
-    /// </summary>
-    /// <param name="spaceData"></param>
-    public void PlaceShape(SpaceData spaceData)
+    private void EndTurn()
     {
-        if (_ending) return;
-        
-        PlayerShapeInfo playerShapeInfo = Current; // get correct shape
-
-        // spawn pieceData
-        PieceData placedPieceData = SpawnShapeOnSpace(playerShapeInfo.prefab, spaceData); // spawn it
-        placedPieceData.Info = Current;
-        placedPieceData.Type = Current.type;
-        spaceData.CurrentPieceData = placedPieceData;
-
-        playerShapeInfo.SpaceDataLastSpawnedOn = spaceData; // store last used spaceData
-
-        // turn ends
-        IncrementTurn();
-        EndState endState = SpaceChecks.CheckForWin();
-        if (endState != EndState.Continue)
-        {
-            placedPieceData.LandSfx = endState == EndState.Win ? winLandSfx : drawLandSfx;
-            _ending = true;
-            StartCoroutine(WinRoutine());
-        }
-    }
-
-    /// <summary>
-    /// Physically spawns a shape in the world on the spaceData provided.
-    /// </summary>
-    /// <param name="prefab"></param>
-    /// <param name="spaceData"></param>
-    private PieceData SpawnShapeOnSpace(GameObject prefab, SpaceData spaceData)
-    {
-        PieceData newPieceData = new PieceData(); // to store pieceData information
-        
-        Vector2Int coords = spaceData.Coords;
-        Spaces[coords.x, coords.y].CurrentPieceData = newPieceData;
-
-        Vector3 spawnOffset = Vector3.up * verticalSpawnDistance;
-        Transform pTransform = Instantiate(prefab).transform; // spawn, get transform
-        pTransform.parent = _manager.PiecesParent; // set in a parent (for editor convenience)
-        pTransform.position = spaceData.PhysicalSpaceTransform.position + spawnOffset; // set up in the air
-        newPieceData.PTransform = pTransform;
-        
-        
-        Rigidbody rb = pTransform.GetComponent<Rigidbody>();
-        float spawnVelocity = _metaWinAchieved ? metaWinSpawnVelocity : verticalSpawnVelocity;
-        rb.velocity = new Vector3(0f, spawnVelocity, 0f);
-        newPieceData.Rb = rb;
-
-        MeshRenderer meshRenderer = pTransform.GetComponent<MeshRenderer>();
-        if (_metaWinAchieved)
-        {
-            SetMrPermanent(meshRenderer);
-        }
-        else
-        {
-            SetMrStandard(meshRenderer);
-        }
-
-        return newPieceData;
     }
 
     private void IncrementTurn()
     {
         _roundTurns++;
-        UpdateIcon();
-    }
-
-    private void UpdateIcon()
-    {
         shapeIcon.sprite = Current.icon;
     }
 
@@ -194,10 +127,7 @@ public partial class BoardScript : MonoBehaviour
         _ending = false;
         EndRound();
     }
-    
-    /// <summary>
-    /// Called by pressing "end round" button
-    /// </summary>
+
     private void EndRound()
     {
         if (_ending) return;
@@ -210,12 +140,14 @@ public partial class BoardScript : MonoBehaviour
     private void TryAddPermanent(SpaceData spaceData)
     {
         if (spaceData == null) return;
+
         // if space exists
-        
+
         PieceData pieceData = spaceData.CurrentPieceData;
         if (pieceData == null) return;
+
         // if pieceData exists (and can be made permanent)
-        
+
         MakePiecePermanent(pieceData);
     }
 
