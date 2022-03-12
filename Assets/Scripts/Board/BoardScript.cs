@@ -38,19 +38,16 @@ public partial class BoardScript : MonoBehaviour
 
     // board can only be 3x3 grid without breaking
     public static readonly SpaceData[,] Spaces = new SpaceData[3, 3];
-    private Vector2Int _lenghts;
-    private Vector2Int Lenghts => _lenghts;
+    private static Vector2Int Lenghts { get; set; }
 
-    private BoardScript() { }
+    // private BoardScript() { } // idk what this does
 
     private void Awake()
     {
-        _lenghts = new Vector2Int(Spaces.GetLength(0), Spaces.GetLength(1));
+        Lenghts = new Vector2Int(Spaces.GetLength(0), Spaces.GetLength(1));
         LineConstructor.Spaces = Spaces;
-        LineConstructor.Lenghts = _lenghts;
+        LineConstructor.Lenghts = Lenghts;
         SpaceChecks.CurrentPlayer = Current;
-        SpaceChecks.Spaces = Spaces;
-        SpaceChecks.Lenghts = _lenghts;
         CreateBoard();
         _manager = Manager.Main;
         _metaWinAchieved = false;
@@ -77,15 +74,7 @@ public partial class BoardScript : MonoBehaviour
 
         CleanBoard();
     }
-
-    private void MetaWin(SpaceData winSpot)
-    {
-        // this will be repeatedly called bc autowin below
-
-        PlaceShape(winSpot);
-        _metaWinAchieved = true;
-    }
-
+    
     private void CleanBoard()
     {
         for (int x = 0; x < Lenghts.x; x++)
@@ -110,8 +99,15 @@ public partial class BoardScript : MonoBehaviour
         }
     }
 
-    private void EndTurn()
+    private void CheckIfEnd()
     {
+        EndState endState = SpaceChecks.UniversalWinCheck();
+
+        if (endState == EndState.ContinueRound) return; // let game play out untill end
+        
+        
+        
+        StartCoroutine(WaitForNewRound(endState));
     }
 
     private void IncrementTurn()
@@ -120,19 +116,20 @@ public partial class BoardScript : MonoBehaviour
         shapeIcon.sprite = Current.icon;
     }
 
-    private IEnumerator WinRoutine()
+    private IEnumerator WaitForNewRound(EndState endState)
     {
-        float waitTime = _metaWinAchieved ? metaWinWait : winWait;
+        float waitTime = endState == EndState.InfiniteWin || endState == EndState.InfiniteDraw ? metaWinWait : winWait;
         yield return new WaitForSeconds(waitTime);
         _ending = false;
-        EndRound();
+        EndRound(endState);
     }
 
-    private void EndRound()
+    private void EndRound(EndState endState)
     {
-        if (_ending) return;
-
-        TryAddPermanent(Current.SpaceDataLastSpawnedOn);
+        if (_ending) return; // can only end if not already ending
+        _ending = true;
+        
+        TryAddPermanent(Current.LastSpacePlacedOn);
         IncrementTurn();
         StartNewRound();
     }

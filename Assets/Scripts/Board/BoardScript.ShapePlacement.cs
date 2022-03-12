@@ -18,17 +18,10 @@ public partial class BoardScript
         placedPieceData.Type = Current.type;
         spaceData.CurrentPieceData = placedPieceData;
 
-        playerShapeInfo.SpaceDataLastSpawnedOn = spaceData; // store last used spaceData
+        playerShapeInfo.LastSpacePlacedOn = spaceData; // store last used spaceData
 
         // turn ends
-        IncrementTurn();
-        EndState endState = SpaceChecks.CheckForWin();
-        if (endState != EndState.Continue)
-        {
-            placedPieceData.LandSfx = endState == EndState.Win ? winLandSfx : drawLandSfx;
-            _ending = true;
-            StartCoroutine(WinRoutine());
-        }
+        CheckIfEnd();
     }
     /// <summary>
     /// Physically spawns a shape in the world on the spaceData provided.

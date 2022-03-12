@@ -6,18 +6,6 @@ public partial class BoardScript
     private static class SpaceChecks
     {
         public static PlayerShapeInfo CurrentPlayer { get; set; }
-        public static SpaceData[,] Spaces
-        {
-            get => _spaces;
-            set => _spaces = value;
-        }
-        private static SpaceData[,] _spaces;
-        public static Vector2Int Lenghts
-        {
-            get => _lenghts;
-            set => _lenghts = value;
-        }
-        private static Vector2Int _lenghts;
 
         private static int TotalSpaceCount => Lenghts.x * Lenghts.y;
 
@@ -35,9 +23,9 @@ public partial class BoardScript
         /// <returns></returns>
         public static EndState UniversalWinCheck()
         {
-            bool noGaps = true;
+            List<PieceData> allPieces = new List<PieceData>();
+
             SpaceData[][] allLines = LineConstructor.GetAllLines();
-            int[] allColorInstances = new int[2];
             foreach (SpaceData[] line in allLines)
             {
                 int redsInLine = 0;
@@ -49,22 +37,33 @@ public partial class BoardScript
 
                     if (piece.Type == PlayerType.Blue) bluesInLine++;
                     else if (piece.Type == PlayerType.Red) redsInLine++;
+
+                    if (!allPieces.Contains(piece)) allPieces.Add(piece);
                 }
                 if (redsInLine >= 3 || bluesInLine >= 3) return EndState.Win;
 
                 if (redsInLine + bluesInLine >= 3) continue; // continue search if line is blocked
-                
-                // if there is a gap
-                noGaps = false;
-                int currentPlayerLineCount = CurrentPlayer.type == PlayerType.Blue ? bluesInLine : redsInLine;
 
-                if (redsInLine == 2 || bluesInLine == 2)
-                {
-                    
-                }
+                // the count relevant for the next player
+                // (not for the current player: currentPlayer is updated after this method)
+                int currentPlayerOccurances = CurrentPlayer.type != PlayerType.Blue ? bluesInLine : redsInLine;
+                
+                if (currentPlayerOccurances == 2) return EndState.InfiniteWin;
             }
 
-            return noGaps ? EndState.Draw : EndState.Continue;
+            // draws if board is filled
+            if (allPieces.Count == TotalSpaceCount) return EndState.Draw;
+            // infinite draws if all the spaces except 1 empty space are all permament pieces
+            if (allPieces.Count == TotalSpaceCount)
+            {
+                foreach (PieceData piece in allPieces)
+                {
+                    if (!piece.IsPermanent) break;
+                }
+                return EndState.InfiniteDraw;
+            }
+            
+            return EndState.ContinueRound;
         }
 
         /// <summary>
@@ -96,7 +95,7 @@ public partial class BoardScript
                 return EndState.Draw;
         
             // if nothing indicating game should end, it continues (and players can continue placing)
-            return EndState.Continue;
+            return EndState.ContinueRound;
         
         }
 
@@ -148,89 +147,88 @@ public partial class BoardScript
             return targetType == oppositeType; // if target spaceData is same as opposite spaceData
         }
 
-        private static (PieceData, Vector2Int)[] GetSurroundingAlikePieces(SpaceData originSpaceData, bool permanentOnly)
-        {
-            PieceData originPieceData = originSpaceData.CurrentPieceData;
-            List<(PieceData, Vector2Int)> surroundingPieces = new List<(PieceData, Vector2Int)>();
-            for (int x = -1; x <= 1; x++)
-            for (int y = -1; y <= 1; y++)
-            {
-                if (x == 0 && y == 0) continue;
-
-                Vector2Int offset = new Vector2Int(x, y);
-                Vector2Int target = originSpaceData.Coords + offset;
-
-                if (!IsValidSpace(target)) continue;
-
-                // if spaceData *can* exist
-
-                SpaceData spaceData = Spaces[target.x, target.y];
-                if (spaceData == null) continue;
-                PieceData pieceData = spaceData.CurrentPieceData;
-                if (pieceData == null) continue;
-
-                // if piece exists
-
-                if (permanentOnly && !pieceData.IsPermanent) continue;
-                if (pieceData.Type != originPieceData.Type) continue;
-
-                // if spaceData is one we are looking for
-
-                // add it to the list of surrounding pieces
-                surroundingPieces.Add((pieceData, offset));
-            }
-            return surroundingPieces.ToArray();
-        }
+        // private static (PieceData, Vector2Int)[] GetSurroundingAlikePieces(SpaceData originSpaceData, bool permanentOnly)
+        // {
+        //     PieceData originPieceData = originSpaceData.CurrentPieceData;
+        //     List<(PieceData, Vector2Int)> surroundingPieces = new List<(PieceData, Vector2Int)>();
+        //     for (int x = -1; x <= 1; x++)
+        //     for (int y = -1; y <= 1; y++)
+        //     {
+        //         if (x == 0 && y == 0) continue;
+        //
+        //         Vector2Int offset = new Vector2Int(x, y);
+        //         Vector2Int target = originSpaceData.Coords + offset;
+        //
+        //         if (!IsValidSpace(target)) continue;
+        //
+        //         // if spaceData *can* exist
+        //
+        //         SpaceData spaceData = Spaces[target.x, target.y];
+        //         if (spaceData == null) continue;
+        //         PieceData pieceData = spaceData.CurrentPieceData;
+        //         if (pieceData == null) continue;
+        //
+        //         // if piece exists
+        //
+        //         if (permanentOnly && !pieceData.IsPermanent) continue;
+        //         if (pieceData.Type != originPieceData.Type) continue;
+        //         // if spaceData is one we are looking for
+        //
+        //         // add it to the list of surrounding pieces
+        //         surroundingPieces.Add((pieceData, offset));
+        //     }
+        //     return surroundingPieces.ToArray();
+        // }
         
-        #region Meta
-        /// <summary>
-        /// Checks all permanent spaces if they have a situation where player has won infinitely
-        /// </summary>
-        /// <returns></returns>
-        public static (EndState state, SpaceData winSpot) InfiniteWin(PlayerShapeInfo player)
-        {
-            int spacesFilled = 0;
-
-            for (int x = 0; x < Lenghts.x; x++)
-            for (int y = 0; y < Lenghts.y; y++)
-            {
-                SpaceData originSpaceData = Spaces[x, y];
-                PieceData originPieceData = originSpaceData.CurrentPieceData;
-
-                if (originPieceData == null || !originPieceData.IsPermanent) continue;
-
-                // if pieceData is permanent
-
-                spacesFilled++;
-
-                if (originPieceData.Type != player.type) continue;
-
-                // if player can place immediately (needed for instant infinite win)
-
-                // check if surrounding pieces have spaceData and that spaceData is same color type
-                foreach ((PieceData data, Vector2Int offset) nextPermanent in GetSurroundingAlikePieces(originSpaceData, true))
-                {
-                    if (nextPermanent.data.Type != player.type) continue;
-
-                    // try to access the opposite spaceData of the one under nextPermanent
-                    Vector2Int oppositePos = originSpaceData.Coords - nextPermanent.offset;
-                    if (!IsValidSpace(oppositePos)) continue;
-
-                    // if space exists
-
-                    SpaceData oppositeSpaceData = Spaces[oppositePos.x, oppositePos.y];
-                    PieceData oppositePieceData = oppositeSpaceData.CurrentPieceData;
-                    if (oppositePieceData != null) continue;
-
-                    // if there is space for a piece to be put
-
-                    return (EndState.Win, oppositeSpaceData); // detected that a player has "infinitely" won.
-                }
-            }
-            if (spacesFilled == TotalSpaceCount) return (EndState.Draw, null);
-
-            return (EndState.Continue, null);
-        }
-        #endregion
+        // #region Meta
+        // /// <summary>
+        // /// Checks all permanent spaces if they have a situation where player has won infinitely
+        // /// </summary>
+        // /// <returns></returns>
+        // public static (EndState state, SpaceData winSpot) InfiniteWin(PlayerShapeInfo player)
+        // {
+        //     int spacesFilled = 0;
+        //
+        //     for (int x = 0; x < Lenghts.x; x++)
+        //     for (int y = 0; y < Lenghts.y; y++)
+        //     {
+        //         SpaceData originSpaceData = Spaces[x, y];
+        //         PieceData originPieceData = originSpaceData.CurrentPieceData;
+        //
+        //         if (originPieceData == null || !originPieceData.IsPermanent) continue;
+        //
+        //         // if pieceData is permanent
+        //
+        //         spacesFilled++;
+        //
+        //         if (originPieceData.Type != player.type) continue;
+        //
+        //         // if player can place immediately (needed for instant infinite win)
+        //
+        //         // check if surrounding pieces have spaceData and that spaceData is same color type
+        //         foreach ((PieceData data, Vector2Int offset) nextPermanent in GetSurroundingAlikePieces(originSpaceData, true))
+        //         {
+        //             if (nextPermanent.data.Type != player.type) continue;
+        //
+        //             // try to access the opposite spaceData of the one under nextPermanent
+        //             Vector2Int oppositePos = originSpaceData.Coords - nextPermanent.offset;
+        //             if (!IsValidSpace(oppositePos)) continue;
+        //
+        //             // if space exists
+        //
+        //             SpaceData oppositeSpaceData = Spaces[oppositePos.x, oppositePos.y];
+        //             PieceData oppositePieceData = oppositeSpaceData.CurrentPieceData;
+        //             if (oppositePieceData != null) continue;
+        //
+        //             // if there is space for a piece to be put
+        //
+        //             return (EndState.Win, oppositeSpaceData); // detected that a player has "infinitely" won.
+        //         }
+        //     }
+        //     if (spacesFilled == TotalSpaceCount) return (EndState.Draw, null);
+        //
+        //     return (EndState.ContinueRound, null);
+        // }
+        // #endregion
     }
 }

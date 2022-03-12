@@ -1,6 +1,6 @@
 ﻿enum EndState
 {
-    Continue,
+    ContinueRound,
     Win,
     Draw,
     InfiniteWin,

@@ -13,5 +13,5 @@ public class PlayerShapeInfo : ScriptableObject
     [Required] public Color permOutline;
     [Required] public Sprite icon;
     [Required] public AudioClip landSfx;
-    public SpaceData SpaceDataLastSpawnedOn { get; set; }
+    public SpaceData LastSpacePlacedOn { get; set; }
 }
