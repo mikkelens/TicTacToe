@@ -2012,6 +2012,10 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: drawSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: f04ae6f857342cd40a36e87fcb6081b6, type: 3}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: shapeIcon
       value: 
       objectReference: {fileID: 957492672}
@@ -2024,9 +2028,21 @@ PrefabInstance:
       value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: roundWinSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: dd903340cac3cd2439e2d7b1fc19341b, type: 3}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: infiniteWinWait
       value: 0.7
       objectReference: {fileID: 0}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: permanentWinSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: e5e8aa914165f4b48ac0bf45db799899, type: 3}
+    - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
+      propertyPath: permanentDrawSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 700f5d42a3202044da686a6cd7898e8a, type: 3}
     - target: {fileID: 7845376182176535336, guid: 0a35c0c5674d9724eb80259023f0c750, type: 3}
       propertyPath: redPlayerShapeInfo
       value: 

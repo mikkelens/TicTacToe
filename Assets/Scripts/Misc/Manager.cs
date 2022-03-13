@@ -59,7 +59,7 @@ public class Manager : MonoBehaviour
                 SpaceData spaceData = spaceScript.SpaceData;
                 if (spaceData.CurrentPieceData == null)
                 {
-                    board.PlaceShape(spaceData);
+                    board.PlayerPlaceShape(spaceData);
                 }
             }
         }

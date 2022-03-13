@@ -1,77 +1,70 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public partial class BoardScript
 {
     private static class LineConstructor
     {
-        public static SpaceData[,] Spaces
-        {
-            get => _spaces;
-            set => _spaces = value;
-        }
-        private static SpaceData[,] _spaces;
-        public static Vector2Int Lenghts
-        {
-            get => _lenghts;
-            set => _lenghts = value;
-        }
-        private static Vector2Int _lenghts;
         public static SpaceData[][] GetAllLines()
         {
-            int expectedLineCount = _lenghts.x + _lenghts.y + 2; // for each direction
-            int lineCount = 0;
-            int diagonalCount = 0;
+            int expectedLineCount = Lenghts.x + Lenghts.y + 2; // for each direction
+            int lineIndex = 0;
             SpaceData[][] allLines = new SpaceData[expectedLineCount][];
-            Vector2Int spacePos = Vector2Int.zero;
-            for (spacePos.x = 0; spacePos.x < _lenghts.x; spacePos.x++)
+            
+            // for every space on the board
+            Vector2Int origin = Vector2Int.zero; // start at (0, 0)
+            for (origin.y = 0; origin.y < Lenghts.y; origin.y++)
+            for (origin.x = 0; origin.x < Lenghts.x; origin.x++)
             {
-                for (spacePos.y = 0; spacePos.y < _lenghts.y; spacePos.y++)
+                // only get lines from an edge with a zero-coordinate (optimization)
+                if (origin.x > 0 && origin.y > 0) continue;
+                
+                // creation of one or more lines from origin
+                Vector2Int[] directions = GetLineDirections(origin);
+                foreach (Vector2Int direction in directions)
                 {
-                    // we only need to search for lines from starting edge
-                    if (spacePos.x > 0 && spacePos.y > 0) continue;
-                    
-                    allLines[lineCount] = GetLine(); // using spacePos and diagonal count.
-                    lineCount++;
+                    SpaceData[] line = ConstructLine(origin, direction);
+                    allLines[lineIndex] = line;
+                    lineIndex++;
+                    Debug.Log($"a: {line[0].Coords} - b: {line[1].Coords} - c: {line[2].Coords}");
                 }
             }
             return allLines; // send the lines back
+        }
 
-            // gets line using ConstructLine()
-            SpaceData[] GetLine()
+        private static Vector2Int[] GetLineDirections(Vector2Int startPos)
+        {
+            List<Vector2Int> directions = new List<Vector2Int>();
+
+            int cardinals = 0; // 1 or 2
+            bool hasMadeDiagonal = false; // 0 or 1
+            do
             {
-                Vector2Int direction;
-                if ((spacePos.x == 0 && spacePos.y == 0) || (diagonalCount < 2 && spacePos.x == _lenghts.x - 1 && spacePos.y == 0)) // do diagonal
-                {
-                    // first and last space in "bottom" (x is 0) of board spaces:
-                    // search for diagonal, up (y is 1) and to the left or right
-                    direction = diagonalCount == 0 ? new Vector2Int(1, 1) : new Vector2Int(-1, 1);
-                    // do position again after, except cardinal this time
-                    spacePos.y--;
-                    diagonalCount++;
-                }
-                else // do cardinal
-                {
-                    direction = spacePos.x == 0 ? Vector2Int.right : Vector2Int.up;
-                }
-                return ConstructLine();
+                // cardinal direction
+                directions.Add(startPos.x == 0 && cardinals == 0 ? Vector2Int.right : Vector2Int.up);
+                cardinals++;
+
+                // if has not made a diagonal, and diagonal direction makes sense
+                if (hasMadeDiagonal || !(startPos.y == 0 && (startPos.x == 0 || startPos.x == Lenghts.x - 1))) continue;
                 
-                // constructs line for GetLine()
-                SpaceData[] ConstructLine()
-                {
-                    SpaceData[] line = new SpaceData[Lenghts.x];
-                    // start from origin
-                    Vector2Int pos = spacePos;
-                    // get first space
-                    line[0] = _spaces[spacePos.x, spacePos.y];
-                    // get remaining spaces in line
-                    for (int i = 1; i < Lenghts.x; i++)
-                    {
-                        pos += direction;
-                        line[i] = _spaces[pos.x, pos.y];
-                    }
-                    return line;
-                }
+                // diagonal direction
+                hasMadeDiagonal = true;
+                directions.Add(startPos.x == 0 ? new Vector2Int(1, 1) : new Vector2Int(-1, 1));
+            } while (startPos == Vector2Int.zero && cardinals < 2); // may repeat for extra cardinals
+            
+            return directions.ToArray();
+        }
+        
+        static SpaceData[] ConstructLine(Vector2Int startPos, Vector2Int direction)
+        {
+            SpaceData[] line = new SpaceData[Lenghts.x];
+            Vector2Int pos = startPos; // starting space is set
+            for (int i = 0; i < Lenghts.x; i++)
+            {
+                line[i] = Spaces[pos.x, pos.y]; // add space to line
+                pos += direction; // go to next space
             }
+            return line;
         }
     }
 }

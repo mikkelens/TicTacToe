@@ -9,7 +9,7 @@ public class PieceData
     public Transform PTransform; // reference to the physical transform
     public Rigidbody Rb;
     public bool IsPermanent; // whether it is a permanent pieceData or not.
-    public PlayerType Type; // color (blue or red)
+    public PlayerType Type; // type (blue or red)
     public PlayerShapeInfo Info;
     private AudioClip _landSfx;
     public AudioClip LandSfx
