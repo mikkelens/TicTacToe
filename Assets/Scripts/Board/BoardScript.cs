@@ -8,61 +8,47 @@ using UnityEngine.UI;
 /// </summary>
 public partial class BoardScript : MonoBehaviour
 {
-    private Manager _manager;
-
     [Header("Settings")] // assigned in prefab
-    // [SerializeField] private float horizontalSpawnDistance = 4f;
     [SerializeField] private float verticalSpawnDistance = 6f;
     [SerializeField] private float verticalSpawnVelocity = -5f;
     [SerializeField] private float winWait = 1.5f;
     [SerializeField] private float metaWinWait = 0.75f;
     [SerializeField] private float metaWinSpawnVelocity = -5f;
 
+    [Header("Player shape references")]
     [SerializeField, Required] private PlayerShapeInfo bluePlayerShapeInfo;
     [SerializeField, Required] private PlayerShapeInfo redPlayerShapeInfo;
 
+    [Header("Visual options")]
     [SerializeField] private Material permanentMaterial;
-
     [SerializeField] private Image shapeIcon;
 
-    [SerializeField] private AudioClip winLandSfx;
-    [SerializeField] private AudioClip drawLandSfx;
-
-    private static bool _ending;
-    private static int _roundTurns;
-    private bool _metaWinAchieved;
-
-    private PlayerShapeInfo Current => _roundTurns % 2 == 0 ? B : R;
-    private PlayerShapeInfo B => bluePlayerShapeInfo;
-    private PlayerShapeInfo R => redPlayerShapeInfo;
+    [Header("Land SFX references")]
+    [SerializeField] private AudioClip roundWinSfx;
+    [SerializeField] private AudioClip permanentWinSfx;
+    [SerializeField] private AudioClip drawSfx;
+    [SerializeField] private AudioClip permanentDrawSfx;
+    
+    private Manager _manager;
+    
+    private bool _ending; // game is ending
+    private int _turnCount; // amount of turns in game (only resets on scene reload)
+    private EndData _endData;
+    
+    [ShowInInspector]
+    private PlayerShapeInfo Current => _turnCount % 2 == 0 ? bluePlayerShapeInfo : redPlayerShapeInfo;
 
     // board can only be 3x3 grid without breaking
     public static readonly SpaceData[,] Spaces = new SpaceData[3, 3];
     private static Vector2Int Lenghts { get; set; }
 
-    // private BoardScript() { } // idk what this does
-
     private void Awake()
     {
-        Lenghts = new Vector2Int(Spaces.GetLength(0), Spaces.GetLength(1));
-        LineConstructor.Spaces = Spaces;
-        LineConstructor.Lenghts = Lenghts;
-        SpaceChecks.CurrentPlayer = Current;
-        CreateBoard();
         _manager = Manager.Main;
-        _metaWinAchieved = false;
+        Lenghts = new Vector2Int(Spaces.GetLength(0), Spaces.GetLength(1));
+        _endData = new EndData { State = EndState.Playing };
         _ending = false;
-
-        void CreateBoard()
-        {
-            for (int x = 0; x < Lenghts.x; x++)
-            {
-                for (int y = 0; y < Lenghts.y; y++)
-                {
-                    Spaces[x, y] = new SpaceData();
-                }
-            }
-        }
+        BoardUtilities.CreateBoard();
     }
 
     /// <summary>
@@ -72,79 +58,69 @@ public partial class BoardScript : MonoBehaviour
     {
         if (_ending) return;
 
-        CleanBoard();
+        BoardUtilities.CleanBoard();
     }
-    
-    private void CleanBoard()
+
+    private void EndTurn()
     {
-        for (int x = 0; x < Lenghts.x; x++)
+        _endData = UniversalEndCheck();
+        EndState endState = _endData.State;
+        
+        IncrementTurn();
+        if (endState == EndState.Playing) return; // let game play out untill end
+        _ending = true;
+
+        Debug.Log($"Round or game end detected: Endstate: {endState}");
+        
+        AudioClip sfx = endState switch
         {
-            for (int y = 0; y < Lenghts.y; y++)
-            {
-                SpaceData spaceData = Spaces[x, y];
-                ref PieceData pieceData = ref spaceData.CurrentPieceData;
-
-                if (pieceData == null) continue;
-
-                // piece exists
-
-                if (pieceData.IsPermanent) continue;
-
-                // piece is not permanent
-
-                Destroy(pieceData.PTransform.gameObject);
-                pieceData = null;
-                spaceData.Script.CanPlayAudio = true;
-            }
+            EndState.WonPermanently => permanentWinSfx,
+            EndState.Won => roundWinSfx,
+            EndState.DrawPermanently => permanentDrawSfx,
+            EndState.Draw => drawSfx,
+            _ => null
+        };
+        if (sfx != null)
+        {
+            Current.LastSpacePlacedOn.CurrentPieceData.LandSfx = sfx;
         }
+        
+        if (endState == EndState.DrawPermanently || endState == EndState.WonPermanently) return; // game is finished
+        
+        Debug.Log("Starting new round.");
+        StartCoroutine(WaitForNewRound());
     }
 
-    private void CheckIfEnd()
+    private IEnumerator WaitForNewRound()
     {
-        EndState endState = SpaceChecks.UniversalWinCheck();
-
-        if (endState == EndState.ContinueRound) return; // let game play out untill end
-        
-        
-        
-        StartCoroutine(WaitForNewRound(endState));
-    }
-
-    private void IncrementTurn()
-    {
-        _roundTurns++;
-        shapeIcon.sprite = Current.icon;
-    }
-
-    private IEnumerator WaitForNewRound(EndState endState)
-    {
-        float waitTime = endState == EndState.InfiniteWin || endState == EndState.InfiniteDraw ? metaWinWait : winWait;
+        float waitTime = _endData.State == EndState.WonPermanently || _endData.State == EndState.DrawPermanently ? metaWinWait : winWait;
         yield return new WaitForSeconds(waitTime);
         _ending = false;
-        EndRound(endState);
+
+        // new round
+        SetupNewRound();
     }
 
-    private void EndRound(EndState endState)
+    private void SetupNewRound()
     {
-        if (_ending) return; // can only end if not already ending
-        _ending = true;
-        
-        TryAddPermanent(Current.LastSpacePlacedOn);
+        AddPermanentOnSpace(Current.LastSpacePlacedOn);
         IncrementTurn();
         StartNewRound();
     }
 
-    private void TryAddPermanent(SpaceData spaceData)
+    private void IncrementTurn()
     {
-        if (spaceData == null) return;
-
-        // if space exists
-
-        PieceData pieceData = spaceData.CurrentPieceData;
+        _turnCount++;
+        shapeIcon.sprite = Current.icon;
+    }
+    
+    private void AddPermanentOnSpace(SpaceData spaceData)
+    {
+        // check if piece exists
+        PieceData pieceData = spaceData?.CurrentPieceData;
         if (pieceData == null) return;
 
         // if pieceData exists (and can be made permanent)
-
         MakePiecePermanent(pieceData);
     }
 
@@ -159,15 +135,14 @@ public partial class BoardScript : MonoBehaviour
         SetMrPermanent(meshRenderer);
     }
 
-    void SetMrPermanent(MeshRenderer meshRenderer)
+    private void SetMrPermanent(Renderer meshRenderer)
     {
         meshRenderer.material = permanentMaterial;
         meshRenderer.material.SetColor("_Color", Current.permColor);
         meshRenderer.material.SetColor("_OutlineColor", Current.permOutline);
         meshRenderer.material.SetColor("_EmissionColor", Current.permEmission);
     }
-
-    void SetMrStandard(MeshRenderer meshRenderer)
+    private void SetMrStandard(Renderer meshRenderer)
     {
         meshRenderer.material.color = Current.normalColor;
         meshRenderer.material.SetColor("_EmissionColor", Current.normalEmission);

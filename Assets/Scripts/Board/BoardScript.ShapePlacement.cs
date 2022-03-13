@@ -6,7 +6,7 @@ public partial class BoardScript
     /// Called by a spaceData that got pressed. Calling this switches turn.
     /// </summary>
     /// <param name="spaceData"></param>
-    public void PlaceShape(SpaceData spaceData)
+    public void PlayerPlaceShape(SpaceData spaceData)
     {
         if (_ending) return;
 
@@ -21,7 +21,7 @@ public partial class BoardScript
         playerShapeInfo.LastSpacePlacedOn = spaceData; // store last used spaceData
 
         // turn ends
-        CheckIfEnd();
+        EndTurn();
     }
     /// <summary>
     /// Physically spawns a shape in the world on the spaceData provided.
@@ -32,23 +32,25 @@ public partial class BoardScript
     {
         PieceData newPieceData = new PieceData(); // to store pieceData information
 
-        Vector2Int coords = spaceData.Coords;
-        Spaces[coords.x, coords.y].CurrentPieceData = newPieceData;
-
         Vector3 spawnOffset = Vector3.up * verticalSpawnDistance;
         Transform pTransform = Instantiate(prefab).transform; // spawn, get transform
         pTransform.parent = _manager.PiecesParent; // set in a parent (for editor convenience)
         pTransform.position = spaceData.PhysicalSpaceTransform.position + spawnOffset; // set up in the air
         newPieceData.PTransform = pTransform;
 
-
         Rigidbody rb = pTransform.GetComponent<Rigidbody>();
-        float spawnVelocity = _metaWinAchieved ? metaWinSpawnVelocity : verticalSpawnVelocity;
+        EndState endState = _endData.State;
+        float spawnVelocity = endState switch
+        {
+            EndState.WonPermanently => metaWinSpawnVelocity,
+            EndState.Playing => verticalSpawnVelocity,
+            _ => verticalSpawnVelocity
+        };
         rb.velocity = new Vector3(0f, spawnVelocity, 0f);
         newPieceData.Rb = rb;
 
         MeshRenderer meshRenderer = pTransform.GetComponent<MeshRenderer>();
-        if (_metaWinAchieved)
+        if (newPieceData.IsPermanent)
         {
             SetMrPermanent(meshRenderer);
         }
