@@ -10,21 +10,23 @@ public partial class BoardScript
     {
         if (_ending) return;
 
-        PlayerShapeInfo playerShapeInfo = Current; // get correct shape
+        PlayerInfo playerInfo = Current; // get correct shape
 
         // spawn pieceData
-        PieceData placedPieceData = SpawnShapeOnSpace(playerShapeInfo.prefab, spaceData); // spawn it
+        PieceData placedPieceData = SpawnShapeOnSpace(playerInfo.prefab, spaceData); // spawn it
+        // give relevant information
         placedPieceData.Info = Current;
         placedPieceData.Type = Current.type;
+        // store it to the space
         spaceData.CurrentPieceData = placedPieceData;
 
-        playerShapeInfo.LastSpacePlacedOn = spaceData; // store last used spaceData
+        playerInfo.LastSpacePlacedOn = spaceData; // store last used spaceData
 
         // turn ends
         EndTurn();
     }
     /// <summary>
-    /// Physically spawns a shape in the world on the spaceData provided.
+    /// Physically spawns a shape in the world on the spaceData provided (called by the space when a player presses on it).
     /// </summary>
     /// <param name="prefab"></param>
     /// <param name="spaceData"></param>
@@ -52,11 +54,11 @@ public partial class BoardScript
         MeshRenderer meshRenderer = pTransform.GetComponent<MeshRenderer>();
         if (newPieceData.IsPermanent)
         {
-            SetMrPermanent(meshRenderer);
+            SetPermanentMaterial(meshRenderer);
         }
         else
         {
-            SetMrStandard(meshRenderer);
+            SetStandardMaterial(meshRenderer);
         }
 
         return newPieceData;

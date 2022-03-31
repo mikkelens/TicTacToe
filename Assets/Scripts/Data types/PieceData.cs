@@ -10,7 +10,7 @@ public class PieceData
     public Rigidbody Rb;
     public bool IsPermanent; // whether it is a permanent pieceData or not.
     public PlayerType Type; // type (blue or red)
-    public PlayerShapeInfo Info;
+    public PlayerInfo Info;
     private AudioClip _landSfx;
     public AudioClip LandSfx
     {

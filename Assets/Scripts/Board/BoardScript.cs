@@ -16,8 +16,8 @@ public partial class BoardScript : MonoBehaviour
     [SerializeField] private float metaWinSpawnVelocity = -5f;
 
     [Header("Player shape references")]
-    [SerializeField, Required] private PlayerShapeInfo bluePlayerShapeInfo;
-    [SerializeField, Required] private PlayerShapeInfo redPlayerShapeInfo;
+    [SerializeField, Required] private PlayerInfo bluePlayerInfo;
+    [SerializeField, Required] private PlayerInfo redPlayerInfo;
 
     [Header("Visual options")]
     [SerializeField] private Material permanentMaterial;
@@ -36,7 +36,7 @@ public partial class BoardScript : MonoBehaviour
     private EndData _endData;
     
     [ShowInInspector]
-    private PlayerShapeInfo Current => _turnCount % 2 == 0 ? bluePlayerShapeInfo : redPlayerShapeInfo;
+    private PlayerInfo Current => _turnCount % 2 == 0 ? bluePlayerInfo : redPlayerInfo;
 
     // board can only be 3x3 grid without breaking
     public static readonly SpaceData[,] Spaces = new SpaceData[3, 3];
@@ -56,6 +56,7 @@ public partial class BoardScript : MonoBehaviour
     /// </summary>
     public void StartNewRound()
     {
+        Debug.Log($"Tried to start new round. Allowed: {!_ending}");
         if (_ending) return;
 
         BoardUtilities.CleanBoard();
@@ -65,12 +66,12 @@ public partial class BoardScript : MonoBehaviour
     {
         _endData = UniversalEndCheck();
         EndState endState = _endData.State;
-        
+
         IncrementTurn();
         if (endState == EndState.Playing) return; // let game play out untill end
         _ending = true;
 
-        Debug.Log($"Round or game end detected: Endstate: {endState}");
+        Debug.Log($"End detected: {endState}");
         
         AudioClip sfx = endState switch
         {
@@ -82,9 +83,11 @@ public partial class BoardScript : MonoBehaviour
         };
         if (sfx != null)
         {
+            // PieceData lastPlacedPiece = 
+            // Debug.Log($"Changed landSFX of {}");
             Current.LastSpacePlacedOn.CurrentPieceData.LandSfx = sfx;
         }
-        
+
         if (endState == EndState.DrawPermanently || endState == EndState.WonPermanently) return; // game is finished
         
         Debug.Log("Starting new round.");
@@ -103,6 +106,7 @@ public partial class BoardScript : MonoBehaviour
 
     private void SetupNewRound()
     {
+        Debug.Log("Settings up new round...");
         AddPermanentOnSpace(Current.LastSpacePlacedOn);
         IncrementTurn();
         StartNewRound();
@@ -132,17 +136,17 @@ public partial class BoardScript : MonoBehaviour
 
         // make pieceData shine
         MeshRenderer meshRenderer = pieceTransform.GetComponent<MeshRenderer>();
-        SetMrPermanent(meshRenderer);
+        SetPermanentMaterial(meshRenderer);
     }
 
-    private void SetMrPermanent(Renderer meshRenderer)
+    private void SetPermanentMaterial(Renderer meshRenderer)
     {
         meshRenderer.material = permanentMaterial;
         meshRenderer.material.SetColor("_Color", Current.permColor);
         meshRenderer.material.SetColor("_OutlineColor", Current.permOutline);
         meshRenderer.material.SetColor("_EmissionColor", Current.permEmission);
     }
-    private void SetMrStandard(Renderer meshRenderer)
+    private void SetStandardMaterial(Renderer meshRenderer)
     {
         meshRenderer.material.color = Current.normalColor;
         meshRenderer.material.SetColor("_EmissionColor", Current.normalEmission);

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public partial class BoardScript
 {
     public static class BoardUtilities
@@ -23,16 +25,14 @@ public partial class BoardScript
                     PieceData pieceData = spaceData.CurrentPieceData;
 
                     if (pieceData == null) continue;
-
                     // piece exists
 
                     if (pieceData.IsPermanent) continue;
-
                     // piece is not permanent
-
+                    
                     Destroy(pieceData.PTransform.gameObject);
-                    pieceData = null;
                     spaceData.Script.CanPlayAudio = true;
+                    spaceData.CurrentPieceData = null;
                 }
             }
         }

@@ -54,26 +54,31 @@ public class SpaceScript : MonoBehaviour
         SpaceData.Coords = Coords;
     }
 
-    private void OnTriggerEnter(Collider col)
+    private void OnTriggerEnter(Collider col) // happens after a piece is assigned to the spacedata
     {
         if (!CanPlayAudio) return;
-        
+
         int layer = LayerMask.NameToLayer("Shape");
         
         if (col.gameObject.layer != layer) return;
         
+        PieceLandDetected();
+    }
+
+    private void PieceLandDetected()
+    {
+        Debug.Log("Piece landed on a space.");
         PlaySfx();
         CanPlayAudio = false;
     }
 
     private void PlaySfx()
     {
-        PieceData currentPiece = SpaceData.CurrentPieceData;
-        if (currentPiece == null) return;
+        if (SpaceData.CurrentPieceData == null) return;
         // if piece exists
-        
-        // set piece audio clip
-        _audio.clip = currentPiece.LandSfx;
+        _audio.clip = SpaceData.CurrentPieceData.LandSfx;
+        Debug.Log($"Played sound effect: {_audio.clip.name}");
+        // set and play piece audio clip
         _audio.Play();
     }
 }

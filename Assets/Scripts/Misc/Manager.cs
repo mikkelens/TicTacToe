@@ -47,7 +47,7 @@ public class Manager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    private void RaycastForSpaceOnMouse()
+    private void RaycastForSpaceOnMouse() // called on mouse clicks
     {
         // raycast on spaceData, call spacescript.pressspace with board
         int mask = LayerMask.GetMask("Space");

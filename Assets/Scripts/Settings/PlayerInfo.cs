@@ -2,7 +2,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "ScriptableObjects/ShapeSettings", fileName = "ShapeSettings 1")]
-public class PlayerShapeInfo : ScriptableObject
+public class PlayerInfo : ScriptableObject
 {
     [Required] public PlayerType type;
     [Required] public GameObject prefab;
